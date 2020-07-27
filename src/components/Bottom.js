@@ -1,24 +1,34 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {View, StyleSheet} from 'react-native'
-import {TabBarIcon} from '../components/TabBarIcon'
-
+import {TabBarIcon} from './TabBarIcon'
 
 const icons = [
-    {text: 'Заказы', name: 'hammer'},
-    {text: 'Склад', name: 'home'},
-    {text: 'Контрагенты', name: 'people'},
-    {text: 'Cделки', name: 'trending-up'},
+    {id: 1, text: 'Заказы', name: 'hammer'},
+    {id: 2, text: 'Склад', name: 'home'},
+    {id: 3, text: 'Контрагенты', name: 'people'},
+    {id: 4, text: 'Cделки', name: 'trending-up'},
 ]
 
-export const Bottom = () => {
+export const Bottom = props => {
+
+    const [focusId, setFocusId] = useState(0);
+
+    const handle = i => {
+        setFocusId(i)
+        console.log(i)
+    }
+
     return <View style={styles.bottom}>
         {icons.map(i => <TabBarIcon
+            id={i.id}
             key={'tabbariconskey' + i.name}
+            onPress={handle}
+            focused={focusId === i.id}
             text={i.text}
             name={
                 (Platform.OS === 'ios'
-                    ? 'ios'
-                    : 'md' ) + '-' + i.name
+                    ? 'ios-'
+                    : 'md-' ) + i.name
             }
         />)}
     </View>
