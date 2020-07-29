@@ -1,8 +1,8 @@
-import React, {useState, useRef} from 'react'
+import React, {useState} from 'react'
 import {View, TextInput, Button, StyleSheet} from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage';
 
 const SERVER = 'https://uchet.store';
-
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 const atob = (input = '') => {
     let str = input.replace(/=+$/, '');
@@ -36,7 +36,9 @@ export const Auth = props => {
 
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
-    const [loginIsValid, setLoginIsValid] = useState(true);
+    const [isLoginValid, setLoginValid] = useState(true);
+
+
 
     const loginButtonHandler = () => {
         // console.log(login, password)
@@ -48,7 +50,7 @@ export const Auth = props => {
             result = !(isNaN(number) || number < 999999 || number > 99999999999999)
         }
 
-        setLoginIsValid(false)
+        setLoginValid(false)
 
         fetch(SERVER + '/api', {
             method: 'POST',
@@ -69,11 +71,15 @@ export const Auth = props => {
 
                 if (res.result) {
                     let jwt = res.JWT
+
+                    try {
+                        AsyncStorage.setItem('jwt', jwt)
+                    } catch (e) {
+                        console.log('AsyncStorage error ' + e)
+                    }
+
                     let payload = parseJwt(jwt);
                     payload.jwt = jwt;
-
-                    console.log(payload);
-
                     props.setAuth(payload);
                 }
 
@@ -90,7 +96,7 @@ export const Auth = props => {
 
     return <View style={styles.auth}>
         <TextInput style={styles.input}
-                   placeholder={'email или Номер телефона'}
+                   placeholder={'Номер телефона или email'}
                    onChangeText={text => setLogin(text)}
                    value={login}
         />

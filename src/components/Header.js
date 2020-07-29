@@ -23,15 +23,15 @@ export const Header = props => {
 const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
-        // justifyContent: 'space-between',
-        justifyContent: 'center',
+        // alignContent: 'center',
+        justifyContent: 'space-between',
+        // justifyContent: 'center',
         backgroundColor: '#3c7a65',
         paddingTop: 40,
         paddingBottom: 5,
         paddingHorizontal: 14
     },
     text: {
-        alignContent: 'center',
         fontSize: 24,
         color: 'white',
     },

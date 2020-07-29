@@ -1,3 +1,6 @@
+import {useState, useEffect, ActivityIndicator} from "react";
+import AsyncStorage from '@react-native-community/async-storage';
+
 const isLocalhost = Boolean(
     window.location.hostname === "localhost" ||
     // [::1] is the IPv6 localhost address.
@@ -15,12 +18,12 @@ let response = {};
 
 export default function fetchPost(url, method = 'GET', data = '') {
 
+    const [isLoading, setLoading] = useState(true);
+
     let jwt = JSON.parse(window.localStorage.getItem('auth')).jwt;
 
     if (typeof jwt !== "string") return false;
 
-    let circularln = document.getElementById('circularln');
-    if (circularln) circularln.style.display = '';
 
     let init = {
         method,
@@ -38,25 +41,23 @@ export default function fetchPost(url, method = 'GET', data = '') {
         'https://api.uchet.store' :
         SERVER;
 
-    return fetch(server + '/' + url, init)
-        .then(res => {
-            response = {
-                status: res.status,
-                ok: res.ok
-            };
-            return res;
-        })
-        .then(res => res.json())
-        .then(res => {
-            response.body = res;
-            return response;
-        })
-        .catch(error => {
-            if (!response.ok) response.error = error;
-            return response;
-        })
-        .finally(() => {
-            if (circularln) circularln.style.display = 'none'
-        });
+    {if (isLoading) <ActivityIndicator/>}
 
+    return fetch(server + '/' + url, init)
+            .then(res => {
+                response = {
+                    status: res.status,
+                    ok: res.ok
+                };
+                return res;
+            })
+            .then(res => res.json())
+            .then(res => {
+                response.body = res;
+                return response;
+            })
+            .catch(error => {
+                if (!response.ok) response.error = error;
+                return response;})
+            .finally(() => setLoading(false));
 }

@@ -3,7 +3,7 @@ import React from "react";
 
 export const Menu = () => {
     return <Ionicons
-        size={33}
+        size={30}
         color={'white'}
         name={Platform.OS === 'ios' ? 'ios-menu' : 'md-menu'}
         onPress={() => console.log('home press')}
