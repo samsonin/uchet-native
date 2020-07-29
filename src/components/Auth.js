@@ -1,20 +1,45 @@
 import React, {useState, useRef} from 'react'
-import {connect} from "react-redux";
 import {View, TextInput, Button, StyleSheet} from 'react-native'
-import {bindActionCreators} from "redux";
-import {exit_app, init_user, upd_app} from "../actions/actionCreator";
 
+const SERVER = 'https://uchet.store';
 
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+const atob = (input = '') => {
+    let str = input.replace(/=+$/, '');
+    let output = '';
 
-function Auth(props){
-    const {init_user} = props;
+    if (str.length % 4 === 1) {
+        throw new Error("'atob' failed: The string to be decoded is not correctly encoded.");
+    }
+    for (let bc = 0, bs = 0, buffer, i = 0;
+         buffer = str.charAt(i++);
+
+         ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+         bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+    ) {
+        buffer = chars.indexOf(buffer);
+    }
+
+    return output;
+}
+const parseJwt = token => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+    return JSON.parse(decodeURIComponent(atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')));
+}
+
+export const Auth = props => {
 
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     const [loginIsValid, setLoginIsValid] = useState(true);
 
     const loginButtonHandler = () => {
-        console.log(login, password)
+        // console.log(login, password)
 
         let r = /^\w+@\w+\.\w{2,5}$/i;
         let result = r.test(login);
@@ -25,14 +50,41 @@ function Auth(props){
 
         setLoginIsValid(false)
 
-        let payload = {
-            user_id: 4,
-            organization_id: 1,
-            admin:true,
-            exp: 1609459200,
-        }
+        fetch(SERVER + '/api', {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: "sign_in",
+                phone_number: login,
+                email: login,
+                password
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
 
-        init_user('JWT', +payload.user_id, +payload.organization_id, payload.admin, payload.exp);
+                if (res.result) {
+                    let jwt = res.JWT
+                    let payload = parseJwt(jwt);
+                    payload.jwt = jwt;
+
+                    console.log(payload);
+
+                    props.setAuth(payload);
+                }
+
+
+
+            })
+            .catch(error => {
+                console.error('Ошибка запроса: ', error)
+                return {result: false}
+            });
+
 
     }
 
@@ -41,9 +93,7 @@ function Auth(props){
                    placeholder={'email или Номер телефона'}
                    onChangeText={text => setLogin(text)}
                    value={login}
-        >
-            Password
-        </TextInput>
+        />
         <TextInput style={styles.input}
                    placeholder={'Пароль'}
                    secureTextEntry
@@ -72,11 +122,3 @@ const styles = StyleSheet.create({
     }
 
 })
-
-const mapDispatchToProps = dispatch => bindActionCreators({
-    init_user,
-    upd_app,
-    exit_app
-}, dispatch);
-
-export default connect(state => (state), mapDispatchToProps)(Auth)

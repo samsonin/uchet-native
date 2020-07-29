@@ -1,32 +1,35 @@
 import {StatusBar} from 'expo-status-bar';
 import React, {useState} from 'react';
-import {Provider} from "react-redux";
 import {ListViewComponent, StyleSheet, Text, View} from 'react-native';
-import store from './src/store';
 
 
 import {Header} from './src/components/Header'
 
 import {MainContent} from './src/components/MainContent';
 import {Bottom} from './src/components/Bottom';
-import Auth from "./src/components/Auth";
+import { Auth } from "./src/components/Auth";
 
 export default function App() {
 
-    const userId = +useState(store.getState().auth.user_id);
+    const [auth, setAuth] = useState({
+        user_id: 0,
+        jwt: '',
+        organization_id: 0,
+        admin: false,
+        expiration_time: 0,
+    });
     const [contentId, setContentId] = useState(0);
 
-    console.log(userId)
+    console.log(auth);
 
-    return <Provider store={store}>
-        <View style={styles.container}>
-            <Header style={styles.header}/>
-            {userId > 0
+    return <View style={styles.container}>
+            <Header isAuth={auth.user_id > 0} style={styles.header}/>
+            {auth.user_id > 0
                 ? <View style={styles.content}>
                     <Text>MainContent</Text>
                 </View>
-                : <Auth />}
-            {userId > 0
+                : <Auth auth={auth} setAuth={setAuth}/>}
+            {auth.user_id > 0
                 ? <Bottom
                     style={styles.buttom}
                     setContentId={setContentId}
@@ -34,7 +37,6 @@ export default function App() {
                 : null}
             <StatusBar style="auto"/>
         </View>
-    </Provider>
 }
 
 const styles = StyleSheet.create({
