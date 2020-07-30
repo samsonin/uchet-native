@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
-import {View, TextInput, Button, StyleSheet} from 'react-native'
+import {View, TextInput, Button, StyleSheet, Alert} from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
+import rest from "../common/Rest";
 
 const SERVER = 'https://uchet.store';
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
@@ -38,8 +39,6 @@ export const Auth = props => {
     const [password, setPassword] = useState('');
     const [isLoginValid, setLoginValid] = useState(true);
 
-
-
     const loginButtonHandler = () => {
         // console.log(login, password)
 
@@ -74,6 +73,13 @@ export const Auth = props => {
 
                     try {
                         AsyncStorage.setItem('jwt', jwt)
+                            .then(jwt => {
+                                rest('initial', 'GET')
+                                    .then(res => {
+                                        AsyncStorage.setItem('app', JSON.stringify(res))
+                                    })
+
+                            })
                     } catch (e) {
                         console.log('AsyncStorage error ' + e)
                     }
@@ -82,7 +88,9 @@ export const Auth = props => {
                     payload.jwt = jwt;
                     props.setAuth(payload);
                 }
-
+                else {
+                    Alert.alert('Ошибка', 'Неправильный логин или пароль')
+                }
 
 
             })

@@ -1,6 +1,8 @@
 import React, {useState} from 'react'
 import {View, StyleSheet} from 'react-native'
+
 import {TabBarIcon} from './TabBarIcon'
+import rest from '../common/Rest';
 
 const icons = [
     {id: 1, text: 'Заказы', name: 'hammer'},
@@ -15,7 +17,8 @@ export const Bottom = props => {
 
     const handle = i => {
         setFocusId(i)
-        console.log(i)
+
+
     }
 
     return <View style={styles.bottom}>
