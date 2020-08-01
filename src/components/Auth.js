@@ -28,19 +28,22 @@ const parseJwt = token => {
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 
     return JSON.parse(decodeURIComponent(atob(base64)
-            .split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')));
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')));
 }
 
 export const Auth = props => {
 
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoginValid, setLoginValid] = useState(true);
+    const [isLoginValid, setLoginValid] = useState(false);
 
-    const loginButtonHandler = () => {
-        // console.log(login, password)
+
+    const loginValidator = login => {
+
+        login = login.trim()
+        setLogin(login)
 
         let r = /^\w+@\w+\.\w{2,5}$/i;
         let result = r.test(login);
@@ -48,47 +51,49 @@ export const Auth = props => {
             let number = +login;
             result = !(isNaN(number) || number < 999999 || number > 99999999999999)
         }
+        setLoginValid(result)
+        return result;
+    }
 
-        setLoginValid(false)
+    const loginButtonHandler = () => {
 
-        fetch(SERVER + '/api', {
+        if (!loginValidator(login)) return
+
+        fetch('https://api.uchet.store/login', {
             method: 'POST',
             mode: 'cors',
             cache: 'no-cache',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                action: "sign_in",
                 phone_number: login,
                 email: login,
                 password
             })
         })
-            .then(res => res.json())
-            .then(res => {
+            .then(res => res.text())
+            .then(jwt => {
 
-                if (res.result) {
-                    let jwt = res.JWT
+                try {
+
+                    let payload = parseJwt(jwt);
+                    payload.jwt = jwt;
+                    props.setAuth(payload);
 
                     try {
                         AsyncStorage.setItem('jwt', jwt)
-                            .then(jwt => {
+                            .then(() => {
                                 rest('initial', 'GET')
                                     .then(res => {
                                         AsyncStorage.setItem('app', JSON.stringify(res))
                                     })
-
                             })
                     } catch (e) {
                         console.log('AsyncStorage error ' + e)
                     }
 
-                    let payload = parseJwt(jwt);
-                    payload.jwt = jwt;
-                    props.setAuth(payload);
-                }
-                else {
+                } catch (e) {
                     Alert.alert('Ошибка', 'Неправильный логин или пароль')
                 }
 
@@ -105,7 +110,7 @@ export const Auth = props => {
     return <View style={styles.auth}>
         <TextInput style={styles.input}
                    placeholder={'Номер телефона или email'}
-                   onChangeText={text => setLogin(text)}
+                   onChangeText={text => loginValidator(text)}
                    value={login}
         />
         <TextInput style={styles.input}
@@ -115,6 +120,7 @@ export const Auth = props => {
                    value={password}
         />
         <Button title='Войти'
+                disabled={!isLoginValid}
                 onPress={loginButtonHandler}
         />
     </View>
