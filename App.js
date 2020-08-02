@@ -1,5 +1,5 @@
 import {StatusBar} from 'expo-status-bar';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {ListViewComponent, StyleSheet, Text, View} from 'react-native';
 
 
@@ -10,6 +10,7 @@ import {Bottom} from './src/components/Bottom';
 import {Auth} from './src/components/Auth';
 import {AccountMenu} from './src/components/AccountMenu'
 import {SubMenu} from "./src/components/SubMenu";
+import ActivityIndicator from './src/components/ActivityIndicator';
 
 export default function App() {
 
@@ -50,14 +51,20 @@ export default function App() {
 
     }
 
+    const activityIndicator = useRef();
+
     return <View style={styles.container}>
         <Header
             isAuth={auth.user_id > 0}
             accountMenuHandler={accountMenuHandler}
         />
+
+        <ActivityIndicator
+            ref={activityIndicator}
+        />
+
         {auth.user_id > 0
             ? <View style={styles.content}>
-
                 {isAccountMenuShow
                     ? <AccountMenu
                         setInitialAuth={setInitialAuth}
@@ -69,17 +76,18 @@ export default function App() {
                 </Text>
 
                 {isSubMenuVisible
-                    ? <SubMenu id={subMenuId} />
+                    ? <SubMenu id={subMenuId}/>
                     : null}
-
             </View>
             : <Auth auth={auth} setAuth={setAuth}/>}
+
         {auth.user_id > 0
             ? <Bottom
                 setContentId={setContentId}
                 subMenu={subMenu}
             />
             : null}
+
         <StatusBar style="auto"/>
     </View>
 }
