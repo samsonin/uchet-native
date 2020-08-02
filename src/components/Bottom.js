@@ -8,7 +8,7 @@ const icons = [
     {id: 1, text: 'Заказы', name: 'hammer'},
     {id: 2, text: 'Склад', name: 'home'},
     {id: 3, text: 'Контрагенты', name: 'people'},
-    {id: 4, text: 'Cделки', name: 'trending-up'},
+    {id: 4, text: 'Аналитика', name: 'trending-up'},
 ]
 
 export const Bottom = props => {
@@ -17,8 +17,7 @@ export const Bottom = props => {
 
     const handle = i => {
         setFocusId(i)
-
-
+        props.subMenu(i)
     }
 
     return <View style={styles.bottom}>
