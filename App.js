@@ -1,11 +1,11 @@
 import {StatusBar} from 'expo-status-bar';
-import React, {useRef, useState} from 'react';
+import React, { useState} from 'react';
 import {ListViewComponent, StyleSheet, Text, View} from 'react-native';
 
+import Context from "./src/context";
 
 import {Header} from './src/components/Header'
-
-import {MainContent} from './src/components/MainContent';
+// import {MainContent} from './src/components/MainContent';
 import {Bottom} from './src/components/Bottom';
 import {Auth} from './src/components/Auth';
 import {AccountMenu} from './src/components/AccountMenu'
@@ -23,6 +23,7 @@ export default function App() {
     }
 
     const [auth, setAuth] = useState(initialAuth);
+    const [isLoading, setLoading] = useState(false);
     const [contentId, setContentId] = useState(0);
     const [isSubMenuVisible, setSubMenuVisible] = useState(false);
     const [subMenuId, setSubMenuId] = useState(0);
@@ -33,6 +34,7 @@ export default function App() {
     }
 
     const setInitialAuth = () => {
+        setAccountMenuShow(false)
         setAuth(initialAuth)
     }
 
@@ -51,45 +53,43 @@ export default function App() {
 
     }
 
-    const activityIndicator = useRef();
-
-    return <View style={styles.container}>
-        <Header
-            isAuth={auth.user_id > 0}
-            accountMenuHandler={accountMenuHandler}
-        />
-
-        <ActivityIndicator
-            ref={activityIndicator}
-        />
-
-        {auth.user_id > 0
-            ? <View style={styles.content}>
-                {isAccountMenuShow
-                    ? <AccountMenu
-                        setInitialAuth={setInitialAuth}
-                    />
-                    : null}
-
-                <Text>
-                    main content
-                </Text>
-
-                {isSubMenuVisible
-                    ? <SubMenu id={subMenuId}/>
-                    : null}
-            </View>
-            : <Auth auth={auth} setAuth={setAuth}/>}
-
-        {auth.user_id > 0
-            ? <Bottom
-                setContentId={setContentId}
-                subMenu={subMenu}
+    return <Context.Provider value={{ setLoading }}>
+        <View style={styles.container}>
+            <Header
+                isAuth={auth.user_id > 0}
+                accountMenuHandler={accountMenuHandler}
             />
-            : null}
 
-        <StatusBar style="auto"/>
-    </View>
+            {isLoading && <ActivityIndicator />}
+
+            {auth.user_id > 0
+                ? <View style={styles.content}>
+                    {isAccountMenuShow
+                        ? <AccountMenu
+                            setInitialAuth={setInitialAuth}
+                        />
+                        : null}
+
+                    <Text>
+                        main content
+                    </Text>
+
+                    {isSubMenuVisible
+                        ? <SubMenu id={subMenuId}/>
+                        : null}
+                </View>
+                : <Auth auth={auth} setAuth={setAuth} isLoading={isLoading} setLoading={setLoading}/>}
+
+            {auth.user_id > 0
+                ? <Bottom
+                    setContentId={setContentId}
+                    subMenu={subMenu}
+                />
+                : null}
+
+            <StatusBar style="auto"/>
+        </View>
+    </Context.Provider>
 }
 
 const styles = StyleSheet.create({

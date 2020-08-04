@@ -59,6 +59,8 @@ export const Auth = props => {
 
         if (!loginValidator(login)) return
 
+        props.setLoading(true)
+
         fetch('https://api.uchet.store/login', {
             method: 'POST',
             mode: 'cors',
@@ -102,6 +104,9 @@ export const Auth = props => {
             .catch(error => {
                 console.error('Ошибка запроса: ', error)
                 return {result: false}
+            })
+            .finally(() => {
+                props.setLoading(false)
             });
 
 
@@ -112,6 +117,7 @@ export const Auth = props => {
                    placeholder={'Номер телефона или email'}
                    onChangeText={text => loginValidator(text)}
                    value={login}
+                   disableFullscreenUI={props.isLoading}
         />
         <TextInput style={styles.input}
                    placeholder={'Пароль'}
@@ -120,7 +126,7 @@ export const Auth = props => {
                    value={password}
         />
         <Button title='Войти'
-                disabled={!isLoginValid}
+                disabled={props.isLoading || !isLoginValid}
                 onPress={loginButtonHandler}
         />
     </View>

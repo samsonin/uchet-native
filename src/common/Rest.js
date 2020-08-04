@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React from "react";
 import AsyncStorage from '@react-native-community/async-storage';
 
 const SERVER = 'https://api.uchet.store';
@@ -6,10 +6,6 @@ const SERVER = 'https://api.uchet.store';
 let response = {};
 
 export default function fetchPost(url, method = 'GET', data = '') {
-
-    // const activityIndicator = React.forwardRef('activityIndicator')
-
-    // console.log('progress', activityIndicator)
 
     return AsyncStorage.getItem('jwt')
         .then(jwt => {
@@ -44,11 +40,10 @@ export default function fetchPost(url, method = 'GET', data = '') {
                             if (!response.ok) response.error = error;
                             return response;
                         })
-                        .finally(() => {
-                            // if (progress) progress.style.display = 'none'
-                        })
                     : false
-            }
-        )
+            })
+        // .finally(() => {
+        //     console.log('finally AsyncStorage')
+        // })
 
 }

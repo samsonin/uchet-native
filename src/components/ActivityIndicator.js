@@ -1,22 +1,24 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {ActivityIndicator, StyleSheet, View, Dimensions} from "react-native";
 
-const App = () => (
-    <View style={[styles.container, styles.horizontal]}>
-        <ActivityIndicator size="large" color="#3c7a65" />
+
+const left = Dimensions.get('window').width/2 - 18
+
+const App = () => {
+
+    return <View style={styles.container}>
+        <ActivityIndicator size="large" color="#3c7a65"/>
     </View>
-);
+
+}
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: "center"
+        position: 'absolute',
+        top: '30%',
+        left,
+        zIndex: 2,
     },
-    horizontal: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        padding: 10
-    }
 });
 
 export default App;
