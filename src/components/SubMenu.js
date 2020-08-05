@@ -28,12 +28,13 @@ export const SubMenu = props => {
     return <View style={styles.view}>
         {
             items[props.id - 1].map(b => <TouchableOpacity
+                key={'btnkeyinsubm' + b.id}
                     style={styles.div}
                 >
                     <Button
-                        key={'btnkeyinsubm' + b.id}
                         style={styles.button}
                         title={b.title}
+                        onPress={() => props.setContentId(b.id)}
                     />
                 </TouchableOpacity>
             )

@@ -11,6 +11,7 @@ import {Auth} from './src/components/Auth';
 import {AccountMenu} from './src/components/AccountMenu'
 import {SubMenu} from "./src/components/SubMenu";
 import ActivityIndicator from './src/components/ActivityIndicator';
+import {Customer} from "./src/common/Customer";
 
 export default function App() {
 
@@ -23,6 +24,7 @@ export default function App() {
     }
 
     const [auth, setAuth] = useState(initialAuth);
+    const [app, setApp] = useState({})
     const [isLoading, setLoading] = useState(false);
     const [contentId, setContentId] = useState(0);
     const [isSubMenuVisible, setSubMenuVisible] = useState(false);
@@ -53,8 +55,11 @@ export default function App() {
 
     }
 
-    return <Context.Provider value={{ setLoading }}>
-        <View style={styles.container}>
+    return <Context.Provider value={{
+        setLoading,
+        app,
+    }}>
+        <View style={styles.container} >
             <Header
                 isAuth={auth.user_id > 0}
                 accountMenuHandler={accountMenuHandler}
@@ -70,15 +75,24 @@ export default function App() {
                         />
                         : null}
 
-                    <Text>
-                        main content
-                    </Text>
+                    {contentId === 5
+                        ? <Customer id={6601} />
+                        : <Text>
+                            main content
+                        </Text>
+                    }
 
                     {isSubMenuVisible
-                        ? <SubMenu id={subMenuId}/>
+                        ? <SubMenu id={subMenuId} setContentId={setContentId}/>
                         : null}
                 </View>
-                : <Auth auth={auth} setAuth={setAuth} isLoading={isLoading} setLoading={setLoading}/>}
+                : <Auth auth={auth}
+                        setAuth={setAuth}
+                        setApp={setApp}
+                        isLoading={isLoading}
+                        setLoading={setLoading}
+                />
+            }
 
             {auth.user_id > 0
                 ? <Bottom
