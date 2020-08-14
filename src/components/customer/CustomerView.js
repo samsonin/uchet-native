@@ -15,13 +15,16 @@ const types = {
     doc_date: 'date',
 }
 
+let count = 1;
+
 export const CustomerView = props => {
 
     const [isDetails, setDetails] = useState(false)
     const {app, setLoading} = useContext(Context)
 
 
-    console.log(app.fields)
+    // console.log(app.fields.allElements)
+    console.log('count', count++)
 
     return <View >
 
@@ -49,13 +52,13 @@ export const CustomerView = props => {
         </View>
 
         <View item xs={12}>
-            {typeof app.fields === 'object'
-                ? app.fields.allElements
-                    .filter(field => field.index === 'customer' && field.is_valid)
-                    .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))
-                    .map(field => <Field field />)
-                : null
-            }
+            {/*{typeof app.fields === 'object'*/}
+            {/*    ? app.fields.allElements*/}
+            {/*        .filter(field => field.index === 'customer' && field.is_valid)*/}
+            {/*        .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))*/}
+            {/*        .map(field => <Field field={field} key={'custfielviewkey' + field.id}/>)*/}
+            {/*    : null*/}
+            {/*}*/}
         </View>
         {/*// <View >*/}
         {/*//     <MyButton*/}
