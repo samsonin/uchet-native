@@ -10,6 +10,9 @@ export const Customer = props => {
   const [customer, setCustomer] = useState({})
 
   const initial = customer => {
+
+    console.log('customer', customer)
+
     setServerCustomer({...customer})
     setCustomer({...customer})
   }

@@ -2,7 +2,6 @@ import React, {useState} from 'react'
 import {View, StyleSheet} from 'react-native'
 
 import {TabBarIcon} from './TabBarIcon'
-import rest from '../common/Rest';
 
 const icons = [
     {id: 1, text: 'Заказы', name: 'hammer'},

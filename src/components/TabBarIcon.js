@@ -1,6 +1,6 @@
 import React from 'react';
 import {Ionicons} from '@expo/vector-icons';
-import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import {Text, StyleSheet, TouchableOpacity} from "react-native";
 
 export const TabBarIcon = props => {
 
