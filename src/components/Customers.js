@@ -55,7 +55,9 @@ export const Customers = () => {
           >
             Физ. лица
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setId(0)}
+          >
             <Ionicons
               name={
                 (Platform.OS === 'ios'

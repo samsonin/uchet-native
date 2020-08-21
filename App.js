@@ -77,7 +77,6 @@ export default function App() {
             : null}
 
           {contentId === 5
-            // ? <Customer id={6601} />
             ? <Customers/>
             : <Text>
               main content

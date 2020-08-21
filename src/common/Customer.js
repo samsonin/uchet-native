@@ -1,8 +1,17 @@
-import React, {useState} from "react";
-
+import React, {useContext, useRef, useState} from "react";
 import rest from './Rest'
-import {CustomerView} from '../components/customer/CustomerView'
 
+import {CustomerView} from '../components/customer/CustomerView'
+import {Button, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import Field from "../components/Field";
+import RBSheet from "react-native-raw-bottom-sheet";
+import Context from "../context";
+
+const types = {
+  birthday: 'date',
+  doc_date: 'date',
+}
 
 export const Customer = props => {
 
@@ -10,9 +19,12 @@ export const Customer = props => {
   const [serverCustomer, setServerCustomer] = useState({})
   const [customer, setCustomer] = useState({})
 
-  const initial = customer => {
+  const [isDetails, setDetails] = useState(false)
+  const {app} = useContext(Context)
+  const refRBSheet = useRef();
 
-    console.log('customer', customer)
+
+  const initial = customer => {
 
     setServerCustomer({...customer})
     setCustomer({...customer})
@@ -66,14 +78,132 @@ export const Customer = props => {
 
   let isEqual = JSON.stringify(serverCustomer) === JSON.stringify(customer)
 
-  return <CustomerView
-    customer={customer}
-    disabled={isRequesting || isEqual}
-    handleChange={handleChange}
-    create={create}
-    update={update}
-    reset={reset}
-  />
+  return <View>
+
+    <View
+      style={styles.controls}
+    >
+
+      <TouchableOpacity
+        onPress={() => setDetails(!isDetails)}
+      >
+        <Ionicons
+
+          name={
+            (Platform.OS === 'ios'
+              ? 'ios'
+              : 'md' ) + '-arrow-back'
+          }
+          size={24}
+          color="black"
+        />
+
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => setDetails(!isDetails)}
+      >
+        <MaterialIcons
+          name={isDetails
+            ? 'expand-less'
+            : 'expand-more'
+          }
+          size={24}
+          color="black"
+        />
+
+      </TouchableOpacity>
+
+    </View>
+
+    <ScrollView
+      style={styles.list}
+    >
+      {typeof app.fields === 'object'
+        ? app.fields.allElements
+          .filter(field => field.index === 'customer' && field.is_valid)
+          .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))
+          .map(field => field.name === 'referal_id'
+            ? <TouchableOpacity
+              style={styles.referalId}
+              key={'custfielviewkey' + field.id}
+              onPress={() => refRBSheet.current.open()}
+            >
+              <Text
+                style={styles.text}
+              >
+                Откуда узнали о нас
+              </Text>
+            </TouchableOpacity>
+            : <Field
+              label={field.value}
+              value={props.customer[field.name]}
+              onChange={props.handleChange}
+              field={field}
+              key={'custfielviewkey' + field.id}
+            />)
+        : null
+      }
+    </ScrollView>
+
+    <View
+      style={styles.buttons}
+    >
+      <Button
+        title={'Отмена'} onPress={() => props.reset()} />
+      <Button
+        title={'Сохранить'} onPress={() => props.update()} />
+    </View>
+
+    <RBSheet
+      ref={refRBSheet}
+      closeOnDragDown={true}
+      closeOnPressMask={false}
+      // customStyles={{
+      //   wrapper: {
+      //     backgroundColor: "transparent"
+      //   },
+      //   draggableIcon: {
+      //     backgroundColor: "#000"
+      //   }
+      // }}
+    >
+      <ScrollView>
+        {app.referals.map(r => r.is_valid
+          ? <Button
+            key={'customerviewreferalsbuttonsk' + r.id}
+            title={r.name}
+            onPress={() => console.log(r.id)}
+          />
+          : null
+        )}
+      </ScrollView>
+    </RBSheet>
+  </View>
 
 }
 
+const styles = StyleSheet.create({
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 40,
+    marginTop: 8,
+    marginHorizontal: 10,
+  },
+  list: {
+    backgroundColor: '#FFF',
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 15,
+  },
+  referalId: {
+    height: 50,
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+  }
+})
