@@ -8,7 +8,7 @@ export const Header = props => {
 
     return <View style={styles.header}>
         {props.isAuth
-            ? <Menu/>
+            ? <Menu leftMenuHandler={props.leftMenuHandler}/>
             : null}
         <Text style={styles.text}
               onPress={() => console.log('brand press')}

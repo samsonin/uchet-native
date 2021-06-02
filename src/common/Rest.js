@@ -11,7 +11,7 @@ export default function fetchPost(url, method = 'GET', data = '') {
   return AsyncStorage.getItem('jwt')
     .then(jwt => {
 
-      return (typeof jwt === "string")
+      return typeof jwt === "string"
         ? fetch(SERVER + '/' + url, {
             method,
             mode: 'cors',

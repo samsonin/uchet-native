@@ -1,12 +1,32 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import {Text, View, StyleSheet} from "react-native";
 import {FontAwesome} from '@expo/vector-icons';
+import Context from "../context";
 
+const unixConverter = unix => {
+
+    const date = new Date(unix * 1000);
+    const day = (date.getDate() < 10 ? '0' : '') + date.getDate();
+    const month = (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1);
+    const year = date.getFullYear(); //full year in yyyy format
+    return (day + '.' + month + '.' + year);
+
+}
 
 export const AccountMenu = props => {
+
+    const {auth, app} = useContext(Context)
+
+    let user = app.users.find(u => u.id === auth.user_id)
+
     return <View style={styles.view} >
-        <Text>
-            Имя
+        <Text style={styles.text}>
+            {user
+                ? user.name
+                : 'Имя'}
+        </Text>
+        <Text style={styles.text}>
+            {'Подписка до: ' + unixConverter(auth.exp)}
         </Text>
         <FontAwesome.Button
             style={styles.button}
@@ -33,5 +53,9 @@ const styles = StyleSheet.create({
     button: {
         borderColor: '#9c9c9c',
         borderWidth: 1,
+    },
+    text: {
+        textAlign: 'center',
+        margin: 5
     }
 })

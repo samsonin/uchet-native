@@ -1,7 +1,6 @@
 import React, {useContext, useRef, useState} from "react";
 import rest from './Rest'
 
-import {CustomerView} from '../components/customer/CustomerView'
 import {Button, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import Field from "../components/Field";
@@ -9,201 +8,204 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import Context from "../context";
 
 const types = {
-  birthday: 'date',
-  doc_date: 'date',
+    birthday: 'date',
+    doc_date: 'date',
 }
 
 export const Customer = props => {
 
-  const [isRequesting, setRequesting] = useState(false)
-  const [serverCustomer, setServerCustomer] = useState({})
-  const [customer, setCustomer] = useState({})
+    const [isRequesting, setRequesting] = useState(false)
+    const [serverCustomer, setServerCustomer] = useState({})
+    const [customer, setCustomer] = useState({})
 
-  const [isDetails, setDetails] = useState(false)
-  const {app} = useContext(Context)
-  const refRBSheet = useRef();
+    const [isDetails, setDetails] = useState(false)
+    const {app} = useContext(Context)
+    const refRBSheet = useRef();
 
 
-  const initial = customer => {
+    const initial = customer => {
 
-    setServerCustomer({...customer})
-    setCustomer({...customer})
-  }
+        setServerCustomer({...customer})
+        setCustomer({...customer})
+    }
 
-  const create = () => {
-    setRequesting(true)
-    rest('customers',
-      'POST',
-      customer
-    )
-      .then(res => {
-        setRequesting(false)
-      })
-  }
+    const create = () => {
+        setRequesting(true)
+        rest('customers',
+            'POST',
+            customer
+        )
+            .then(res => {
+                setRequesting(false)
+            })
+    }
 
-  const update = () => {
-    setRequesting(true)
-    rest('customers/' + customer.id,
-      'PUT',
-      customer
-    )
-      .then(res => {
-        if (res.ok) initial(res.body.customers[0])
-        setRequesting(false)
-      })
-  }
+    const update = () => {
+        setRequesting(true)
+        rest('customers/' + customer.id,
+            'PUT',
+            customer
+        )
+            .then(res => {
+                if (res.ok) initial(res.body.customers[0])
+                setRequesting(false)
+            })
+    }
 
-  const reset = () => {
-    setCustomer({...serverCustomer})
-  }
+    const reset = () => {
+        setCustomer({...serverCustomer})
+    }
 
-  const handleChange = (name, value) => {
-    let newCustomer = {...customer}
-    newCustomer[name] = value
-    setCustomer(newCustomer)
-  }
+    const handleChange = (name, value) => {
 
-  let id = props.id || 0;
+        console.log(name, value)
 
-  if (!isRequesting && id > 0 && customer.id === undefined) {
+        let newCustomer = {...customer}
+        newCustomer[name] = value
+        setCustomer(newCustomer)
+    }
 
-    setRequesting(true)
-    rest('customers/' + id)
-      .then(res => {
-        if (res.ok) initial(res.body)
-        setRequesting(false)
-      })
+    let id = props.id || 0;
 
-  }
+    if (!isRequesting && id > 0 && customer.id === undefined) {
 
-  let isEqual = JSON.stringify(serverCustomer) === JSON.stringify(customer)
+        setRequesting(true)
+        rest('customers/' + id)
+            .then(res => {
+                if (res.ok) initial(res.body)
+                setRequesting(false)
+            })
 
-  return <View>
+    }
 
-    <View
-      style={styles.controls}
-    >
+    let isEqual = JSON.stringify(serverCustomer) === JSON.stringify(customer)
 
-      <TouchableOpacity
-        onPress={() => setDetails(!isDetails)}
-      >
-        <Ionicons
+    return <View>
 
-          name={
-            (Platform.OS === 'ios'
-              ? 'ios'
-              : 'md' ) + '-arrow-back'
-          }
-          size={24}
-          color="black"
-        />
+        <View
+            style={styles.controls}
+        >
 
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => setDetails(!isDetails)}
-      >
-        <MaterialIcons
-          name={isDetails
-            ? 'expand-less'
-            : 'expand-more'
-          }
-          size={24}
-          color="black"
-        />
-
-      </TouchableOpacity>
-
-    </View>
-
-    <ScrollView
-      style={styles.list}
-    >
-      {typeof app.fields === 'object'
-        ? app.fields.allElements
-          .filter(field => field.index === 'customer' && field.is_valid)
-          .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))
-          .map(field => field.name === 'referal_id'
-            ? <TouchableOpacity
-              style={styles.referalId}
-              key={'custfielviewkey' + field.id}
-              onPress={() => refRBSheet.current.open()}
+            <TouchableOpacity
+                onPress={() => props.setId('')}
             >
-              <Text
-                style={styles.text}
-              >
-                Откуда узнали о нас
-              </Text>
+                <Ionicons
+
+                    name={
+                        (Platform.OS === 'ios'
+                            ? 'ios'
+                            : 'md') + '-arrow-back'
+                    }
+                    size={24}
+                    color="black"
+                />
+
             </TouchableOpacity>
-            : <Field
-              label={field.value}
-              value={props.customer[field.name]}
-              onChange={props.handleChange}
-              field={field}
-              key={'custfielviewkey' + field.id}
-            />)
-        : null
-      }
-    </ScrollView>
 
-    <View
-      style={styles.buttons}
-    >
-      <Button
-        title={'Отмена'} onPress={() => props.reset()} />
-      <Button
-        title={'Сохранить'} onPress={() => props.update()} />
+            <TouchableOpacity
+                onPress={() => setDetails(!isDetails)}
+            >
+                <MaterialIcons
+                    name={isDetails
+                        ? 'expand-less'
+                        : 'expand-more'
+                    }
+                    size={24}
+                    color="black"
+                />
+
+            </TouchableOpacity>
+
+        </View>
+
+        <ScrollView
+            style={styles.list}
+        >
+            {typeof app.fields === 'object'
+                ? app.fields.allElements
+                    .filter(field => field.index === 'customer' && field.is_valid)
+                    .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))
+                    .map(field => field.name === 'referal_id'
+                        ? <TouchableOpacity
+                            style={styles.referalId}
+                            key={'custfielviewkey' + field.id}
+                            onPress={() => refRBSheet.current.open()}
+                        >
+                            <Text
+                                style={styles.text}
+                            >
+                                Откуда узнали о нас
+                            </Text>
+                        </TouchableOpacity>
+                        : <Field
+                            label={field.value}
+                            value={customer[field.name]}
+                            onChange={() => handleChange(field.name, field.value)}
+                            field={field}
+                            key={'custfielviewkey' + field.id}
+                        />)
+                : null
+            }
+        </ScrollView>
+
+        <View
+            style={styles.buttons}
+        >
+            <Button
+                title={'Отмена'} onPress={() => reset()}/>
+            <Button
+                title={'Сохранить'} onPress={() => update()}/>
+        </View>
+
+        <RBSheet
+            ref={refRBSheet}
+            closeOnDragDown={true}
+            closeOnPressMask={false}
+            // customStyles={{
+            //   wrapper: {
+            //     backgroundColor: "transparent"
+            //   },
+            //   draggableIcon: {
+            //     backgroundColor: "#000"
+            //   }
+            // }}
+        >
+            <ScrollView>
+                {app.referals.map(r => r.is_valid
+                    ? <Button
+                        key={'customerviewreferalsbuttonsk' + r.id}
+                        title={r.name}
+                        onPress={() => console.log(r.id)}
+                    />
+                    : null
+                )}
+            </ScrollView>
+        </RBSheet>
     </View>
-
-    <RBSheet
-      ref={refRBSheet}
-      closeOnDragDown={true}
-      closeOnPressMask={false}
-      // customStyles={{
-      //   wrapper: {
-      //     backgroundColor: "transparent"
-      //   },
-      //   draggableIcon: {
-      //     backgroundColor: "#000"
-      //   }
-      // }}
-    >
-      <ScrollView>
-        {app.referals.map(r => r.is_valid
-          ? <Button
-            key={'customerviewreferalsbuttonsk' + r.id}
-            title={r.name}
-            onPress={() => console.log(r.id)}
-          />
-          : null
-        )}
-      </ScrollView>
-    </RBSheet>
-  </View>
 
 }
 
 const styles = StyleSheet.create({
-  controls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    height: 40,
-    marginTop: 8,
-    marginHorizontal: 10,
-  },
-  list: {
-    backgroundColor: '#FFF',
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 15,
-  },
-  referalId: {
-    height: 50,
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 20,
-  }
+    controls: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        height: 40,
+        marginTop: 8,
+        marginHorizontal: 10,
+    },
+    list: {
+        backgroundColor: '#FFF',
+    },
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 15,
+    },
+    referalId: {
+        height: 50,
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 20,
+    }
 })

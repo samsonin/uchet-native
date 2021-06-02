@@ -16,11 +16,19 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "android": {
+      "permissions": [
+        "CAMERA"
+      ]
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera for barcode scanner only!"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     }
-  }
+  },
 }
