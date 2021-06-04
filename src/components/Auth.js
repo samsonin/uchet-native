@@ -1,10 +1,12 @@
 import React, {useState} from 'react'
 import {View, TextInput, Button, StyleSheet, Alert} from 'react-native'
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import rest from "../common/Rest";
 
-const SERVER = 'https://uchet.store';
+import {LOGIN, PASS} from "@env"
+
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
 const atob = (input = '') => {
     let str = input.replace(/=+$/, '');
     let output = '';
@@ -23,6 +25,7 @@ const atob = (input = '') => {
 
     return output;
 }
+
 const parseJwt = token => {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -35,10 +38,9 @@ const parseJwt = token => {
 
 export const Auth = props => {
 
-    const [login, setLogin] = useState('');
-    const [password, setPassword] = useState('');
+    const [login, setLogin] = useState(LOGIN || '');
+    const [password, setPassword] = useState(PASS || '');
     const [isLoginValid, setLoginValid] = useState(false);
-
 
     const loginValidator = login => {
 
@@ -127,10 +129,11 @@ export const Auth = props => {
                    value={password}
         />
         <Button title='Войти'
-                disabled={props.isLoading || !isLoginValid}
+                disabled={props.isLoading || (!LOGIN && !isLoginValid)}
                 onPress={loginButtonHandler}
         />
     </View>
+
 }
 
 const styles = StyleSheet.create({

@@ -4,6 +4,8 @@ import {Button, ListViewComponent, StyleSheet, Text, View} from 'react-native';
 
 import Context from "./src/context";
 
+import rest from "./src/common/Rest"
+
 import {Header} from './src/components/Header'
 // import {MainContent} from './src/components/MainContent';
 import {Bottom} from './src/components/Bottom';
@@ -18,6 +20,7 @@ import {Transit} from "./src/components/Transit";
 import {Customers} from "./src/components/Customers";
 import {Daily} from "./src/components/Daily";
 import {BarCodeScanner} from "expo-barcode-scanner";
+import {Good} from "./src/components/Good";
 
 export default function App() {
 
@@ -38,19 +41,8 @@ export default function App() {
     const [isAccountMenuShow, setAccountMenuShow] = useState(false);
     const [isLeftMenuShow, setIsLeftMenuShow] = useState(false);
     const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
-    const [scanned, setScanned] = useState(false);
-
-    useState(() => {
-
-        if (isBarcodeOpen) {
-
-            setIsLeftMenuShow(false)
-
-        }
-
-        console.log(isBarcodeOpen)
-
-    }, [isBarcodeOpen])
+    const [isRequesting, setIsRequesting] = useState(false)
+    const [good, setGood] = useState()
 
     const accountMenuHandler = () => {
         setAccountMenuShow(!isAccountMenuShow)
@@ -82,9 +74,34 @@ export default function App() {
 
     }
 
-    const handleBarCodeScanned = ({ type, data }) => {
-        setScanned(true);
-        console.log(data);
+    const handleBarCodeScanned = ({type, data}) => {
+
+        setIsBarcodeOpen(false)
+        setIsLeftMenuShow(false)
+
+        if (isRequesting) return
+
+        setIsRequesting(true)
+
+        // if (type !== 32) return
+
+        console.log(typeof type, type, data, isRequesting)
+
+        rest('goods/' + data)
+            .then(res => {
+
+                setIsRequesting(false)
+
+                if (res.status === 200) {
+
+                    setContentId(99)
+                    setGood(res.body)
+
+                }
+
+            })
+
+
     }
 
     return <Context.Provider value={{
@@ -102,53 +119,50 @@ export default function App() {
             {isLoading && <ActivityIndicator/>}
 
             {auth.user_id > 0
-                ? <View style={styles.content}>
-                    {isLeftMenuShow
-                        ? true || app.stock_id
-                            ? <LeftMenu
-                                close={() => setIsLeftMenuShow(false)}
-                                setIsBarcodeOpen={setIsBarcodeOpen}
-                            />
-                            : <StocksSelect/>
-                        : null}
-                    {isAccountMenuShow
-                        ? <AccountMenu
+                ? <>
+                    <View style={styles.content}>
+                        {isLeftMenuShow && !isBarcodeOpen && <LeftMenu
+                            close={() => setIsLeftMenuShow(false)}
+                            setIsBarcodeOpen={setIsBarcodeOpen}
+                        />}
+                        {isAccountMenuShow && !isBarcodeOpen && <AccountMenu
                             setInitialAuth={setInitialAuth}
-                        />
-                        : null}
+                        />}
 
-                    {isBarcodeOpen
-                        ? <View style={styles.container}>
-                            <BarCodeScanner
+                        {isBarcodeOpen
+                            ? <BarCodeScanner
                                 // type="front"
-                                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                                // onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                                onBarCodeScanned={handleBarCodeScanned}
                                 style={StyleSheet.absoluteFillObject}
                             />
-                            {scanned && <Button
-                                title={'Tap to Scan Again'}
-                                onPress={() => setScanned(false)}
-                            />}
-                        </View>
-                        : contentId === 3
-                            ? <Transit/>
-                            : contentId === 5
-                                ? <Customers/>
-                                : contentId === 8
-                                    ? <Daily/>
-                                    : <Text>
-                                        main content:
-                                        {contentId}
-                                    </Text>
-                    }
+                            : contentId === 3
+                                ? <Transit/>
+                                : contentId === 5
+                                    ? <Customers/>
+                                    : contentId === 8
+                                        ? <Daily/>
+                                    : contentId === 99
+                                        ? good && <Good good={good}/>
+                                        : <Text>
+                                            main content:
+                                            {contentId}
+                                        </Text>
+                        }
 
-                    {isSubMenuVisible
-                        ? <SubMenu
+                        {isSubMenuVisible && !isBarcodeOpen && <SubMenu
                             id={subMenuId}
                             setContentId={setContentId}
                             setSubMenuVisible={setSubMenuVisible}
-                        />
-                        : null}
-                </View>
+                        />}
+
+                    </View>
+                    {isBarcodeOpen && <Button style={styles.scannerCancelButton}
+                                              title='отмена'
+                                              onPress={() => setIsBarcodeOpen(false)}
+                                              color="red"
+                    />}
+                </>
                 : <Auth auth={auth}
                         setAuth={setAuth}
                         setApp={setApp}
@@ -180,4 +194,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,246,16,0.34)',
         height: '80%',
     },
+    scannerCancelButton: {
+        alignSelf: 'flex-end',
+        marginBottom: 20
+    }
 })

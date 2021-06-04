@@ -2,6 +2,6 @@ import React from "react";
 
 export const Daily = () => {
 
-return ''
+return null
 
 }

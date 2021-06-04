@@ -1,5 +1,4 @@
 import {UPD_APP} from "../constants";
-// import AsyncStorage from '@react-native-community/async-storage';
 
 const initialState = {
     balance: 0,
