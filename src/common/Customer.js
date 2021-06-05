@@ -78,7 +78,7 @@ export const Customer = props => {
 
     }
 
-    let isEqual = JSON.stringify(serverCustomer) === JSON.stringify(customer)
+    // let isEqual = JSON.stringify(serverCustomer) === JSON.stringify(customer)
 
     return <View>
 
@@ -121,31 +121,28 @@ export const Customer = props => {
         <ScrollView
             style={styles.list}
         >
-            {typeof app.fields === 'object'
-                ? app.fields.allElements
-                    .filter(field => field.index === 'customer' && field.is_valid)
-                    .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))
-                    .map(field => field.name === 'referal_id'
-                        ? <TouchableOpacity
-                            style={styles.referalId}
-                            key={'custfielviewkey' + field.id}
-                            onPress={() => refRBSheet.current.open()}
+            {typeof app.fields === 'object' && app.fields.allElements
+                .filter(field => field.index === 'customer' && field.is_valid)
+                .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))
+                .map(field => field.name === 'referal_id'
+                    ? <TouchableOpacity
+                        style={styles.referalId}
+                        key={'custfielviewkey' + field.id}
+                        onPress={() => refRBSheet.current.open()}
+                    >
+                        <Text
+                            style={styles.text}
                         >
-                            <Text
-                                style={styles.text}
-                            >
-                                Откуда узнали о нас
-                            </Text>
-                        </TouchableOpacity>
-                        : <Field
-                            label={field.value}
-                            value={customer[field.name]}
-                            onChange={() => handleChange(field.name, field.value)}
-                            field={field}
-                            key={'custfielviewkey' + field.id}
-                        />)
-                : null
-            }
+                            Откуда узнали о нас
+                        </Text>
+                    </TouchableOpacity>
+                    : <Field
+                        label={field.value}
+                        value={customer[field.name]}
+                        onChange={() => handleChange(field.name, field.value)}
+                        field={field}
+                        key={'custfielviewkey' + field.id}
+                    />)}
         </ScrollView>
 
         <View
@@ -161,24 +158,15 @@ export const Customer = props => {
             ref={refRBSheet}
             closeOnDragDown={true}
             closeOnPressMask={false}
-            // customStyles={{
-            //   wrapper: {
-            //     backgroundColor: "transparent"
-            //   },
-            //   draggableIcon: {
-            //     backgroundColor: "#000"
-            //   }
-            // }}
         >
             <ScrollView>
-                {app.referals.map(r => r.is_valid
-                    ? <Button
-                        key={'customerviewreferalsbuttonsk' + r.id}
-                        title={r.name}
-                        onPress={() => console.log(r.id)}
-                    />
-                    : null
-                )}
+                {app.referals.map(r => r.is_valid && <Button
+                    color="#999"
+                    key={'customerviewreferalsbuttonsk' + r.id}
+                    style={styles.scrollButton}
+                    title={r.name}
+                    onPress={() => console.log(r.id)}
+                />)}
             </ScrollView>
         </RBSheet>
     </View>
@@ -207,5 +195,8 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 20,
+    },
+    scrollButton: {
+        backgroundColor: "#030303"
     }
 })

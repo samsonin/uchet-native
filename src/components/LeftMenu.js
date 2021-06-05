@@ -1,12 +1,19 @@
-import React from 'react';
-import {StyleSheet, Text, View} from "react-native";
+import React, {useRef} from 'react';
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {FontAwesome} from "@expo/vector-icons";
+
+import {StocksSelect} from "./StocksSelect";
 
 export const LeftMenu = props => {
 
     return <View style={styles.view}>
+
+        <StocksSelect
+            st={styles.button}
+        />
+
         <FontAwesome.Button
-            style={styles.button}
+            // style={styles.button}
             name={'barcode'}
             backgroundColor={"#0c8098"}
             onPress={() => props.setIsBarcodeOpen(true)}
@@ -29,8 +36,8 @@ const styles = StyleSheet.create({
         padding: 2,
     },
     button: {
-        borderColor: '#9c9c9c',
-        borderWidth: 1,
-        margin: 2,
+        // borderColor: '#9c9c9c',
+        // borderWidth: 1,
+        // margin: 2,
     }
 })

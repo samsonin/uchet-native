@@ -13,7 +13,6 @@ import {Auth} from './src/components/Auth';
 import {AccountMenu} from './src/components/AccountMenu'
 import {LeftMenu} from './src/components/LeftMenu'
 import {SubMenu} from "./src/components/SubMenu";
-import {StocksSelect} from "./src/components/StocksSelect";
 import ActivityIndicator from './src/components/ActivityIndicator';
 import {Customer} from "./src/common/Customer";
 import {Transit} from "./src/components/Transit";
@@ -44,6 +43,20 @@ export default function App() {
     const [isRequesting, setIsRequesting] = useState(false)
     const [good, setGood] = useState()
 
+    const setStockId = id => {
+
+        setApp(prev => {
+
+            let newApp = {...prev}
+
+            newApp.stock_id = id
+
+            return newApp
+
+        })
+
+    }
+
     const accountMenuHandler = () => {
         setAccountMenuShow(!isAccountMenuShow)
     }
@@ -51,6 +64,7 @@ export default function App() {
     const setInitialAuth = () => {
         setAccountMenuShow(false)
         setAuth(initialAuth)
+        setApp({})
     }
 
     const leftMenuHandler = () => {
@@ -107,6 +121,7 @@ export default function App() {
     return <Context.Provider value={{
         setLoading,
         app,
+        setStockId,
         auth
     }}>
         <View style={styles.container}>
@@ -121,10 +136,12 @@ export default function App() {
             {auth.user_id > 0
                 ? <>
                     <View style={styles.content}>
+
                         {isLeftMenuShow && !isBarcodeOpen && <LeftMenu
                             close={() => setIsLeftMenuShow(false)}
                             setIsBarcodeOpen={setIsBarcodeOpen}
                         />}
+
                         {isAccountMenuShow && !isBarcodeOpen && <AccountMenu
                             setInitialAuth={setInitialAuth}
                         />}
@@ -142,12 +159,12 @@ export default function App() {
                                     ? <Customers/>
                                     : contentId === 8
                                         ? <Daily/>
-                                    : contentId === 99
-                                        ? good && <Good good={good}/>
-                                        : <Text>
-                                            main content:
-                                            {contentId}
-                                        </Text>
+                                        : contentId === 99
+                                            ? good && <Good good={good}/>
+                                            : <Text>
+                                                main content:
+                                                {contentId}
+                                            </Text>
                         }
 
                         {isSubMenuVisible && !isBarcodeOpen && <SubMenu

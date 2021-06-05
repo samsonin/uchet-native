@@ -90,8 +90,11 @@ export const Auth = props => {
                             .then(() => {
                                 rest('initial', 'GET')
                                     .then(res => {
-                                        // AsyncStorage.setItem('app', JSON.stringify(res))
-                                        props.setApp(res.body)
+
+                                        if (res.status === 200) {
+                                            props.setApp(res.body)
+                                        }
+
                                     })
                             })
                     } catch (e) {
