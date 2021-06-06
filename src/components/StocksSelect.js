@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useRef} from 'react';
 import {Button, ScrollView, StyleSheet, Text} from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
 
