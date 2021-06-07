@@ -11,16 +11,36 @@ const fontSize = 18
 export const Good = props => {
 
     const [allowedOrders, setAllowedOrders] = useState([])
+    const [currentOrder, setCurrentOrder] = useState()
+    const [sum, setSum] = useState(() => props.good.sum.toString())
 
-    const {app} = useContext(Context)
+    const {auth, app} = useContext(Context)
 
     const refRBSheet = useRef()
 
-    const toOrder = (stock_id, order_id) => {
+    const toOrder = () => {
 
-        console.log(stock_id, order_id)
+        console.log(currentOrder.stock_id, currentOrder.order_id)
+
+        rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id + '/' + props.goog.barcode)
+            .then(res => {
+
+                console.log(res.body)
+
+            })
 
     }
+
+    const toSale = () => {
+
+        console.log(currentOrder.stock_id, props.good.barcode)
+
+    }
+
+    const makeTitle = ({stock_id, order_id}) => stock_id === app.stock_id
+        ? order_id.toString()
+        : app.stocks.find(s => s.id === stock_id).name + ', ' + order_id
+
 
     useEffect(() => {
 
@@ -30,6 +50,7 @@ export const Good = props => {
                 if (res.status === 200) {
 
                     setAllowedOrders(res.body)
+                    setCurrentOrder(res.body[0])
 
                 }
 
@@ -37,7 +58,9 @@ export const Good = props => {
 
     }, [])
 
-    // console.log(props.good)
+    const position = app.positions.find(p => p.id === auth.position_id)
+
+    // console.log(position)
 
     let category = app.categories.find(c => c.id === props.good.category_id)
     let categoryName = category
@@ -103,41 +126,62 @@ export const Good = props => {
             style={{
                 alignSelf: 'center',
                 fontSize: fontSize,
-                marginBottom: 20
+                marginBottom: 50
             }}
         >
             {'Поставщик : ' + app.providers.find(p => p.id === props.good.provider_id).name}
         </Text>
 
 
+        {!props.good.wo && <>
 
-        <Button
-            style={{
-                margin: 5,
-            }}
-            title="в заказ..."
-            onPress={() => refRBSheet.current.open()}
-        />
+            {position.is_sale && <View style={styles.rowView}
+                >
+                    <TextInput
+                        style={{
+                            fontSize: fontSize + 8
+                        }}
+                        value={sum}
+                        onChange={v => setSum(v)}
+                        keyboardType="numeric"
+                    />
+                    <Button
+                        onPress={() => toSale()}
+                        title="продать"/>
+                </View>}
 
-        <RBSheet
-            ref={refRBSheet}
-            closeOnDragDown={true}
-            closeOnPressMask={true}
-            height={200}
-        >
-            <ScrollView>
-                {allowedOrders.map(o => <Button
-                    color="#999"
-                    key={'customerviewrallowedOrders' + o.stock_id + o.order_id}
-                    style={styles.scrollButton}
-                    title={o.stock_id === app.stock_id
-                        ? o.order_id.toString()
-                        : app.stocks.find(s => s.id === o.stock_id).name + ', ' + o.order_id}
-                    onPress={() => toOrder(o.stock_id, o.order_id)}
-                />)}
-            </ScrollView>
-        </RBSheet>
+            {currentOrder && (<View style={styles.rowView}
+            ><Button
+                title={makeTitle(currentOrder)}
+                onPress={() => refRBSheet.current.open()}
+            />
+                <Button
+                    title="в заказ..."
+                    onPress={() => toOrder()}
+                />
+            </View>)}
 
+            <RBSheet
+                ref={refRBSheet}
+                closeOnDragDown={true}
+                closeOnPressMask={true}
+                height={200}
+            >
+                <ScrollView>
+                    {allowedOrders.map(o => <Button
+                        color="#999"
+                        key={'customerviewrallowedOrders' + o.stock_id + o.order_id}
+                        style={styles.scrollButton}
+                        title={makeTitle(o)}
+                        onPress={() => {
+                            refRBSheet.current.close()
+                            setCurrentOrder(o)
+                        }}
+                    />)}
+                </ScrollView>
+            </RBSheet>
+
+        </>}
     </View>
 
 }
@@ -153,6 +197,11 @@ const styles = StyleSheet.create({
     title: {
         marginLeft: 1,
         fontSize: 30,
+    },
+    rowView: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 20
     },
     button: {
         margin: 5,
