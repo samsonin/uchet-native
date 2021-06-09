@@ -99,7 +99,7 @@ export default function App() {
 
         // if (type !== 32) return
 
-        console.log(typeof type, type, data, isRequesting)
+        // console.log(typeof type, type, data, isRequesting)
 
         rest('goods/' + data)
             .then(res => {

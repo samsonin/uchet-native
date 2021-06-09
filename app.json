@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "UchetNative",
-    "slug": "UchetNative",
-    "version": "1.0.0",
+    "name": "UchetStore",
+    "slug": "uchetstore",
+    "version": "1.0.2",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/uchetStoreIcon.png",
     "splash": {
       "image": "./assets/splash2.png",
       "resizeMode": "contain",
@@ -25,6 +25,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "description": "",
+    "android": {
+      "package": "com.samsonin.uchetstore"
     }
   }
 }

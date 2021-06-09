@@ -115,7 +115,6 @@ export const Auth = props => {
                 props.setLoading(false)
             });
 
-
     }
 
     return <View style={styles.auth}>

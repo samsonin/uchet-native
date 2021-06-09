@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Button, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View} from "react-native";
 
 import Context from "../context";
 import RBSheet from "react-native-raw-bottom-sheet";
@@ -13,6 +13,8 @@ export const Good = props => {
     const [allowedOrders, setAllowedOrders] = useState([])
     const [currentOrder, setCurrentOrder] = useState()
     const [sum, setSum] = useState(() => props.good.sum.toString())
+    const [requesting, setRequesting] = useState(false)
+    const [wo, setWo] = useState(() => props.good.wo)
 
     const {auth, app} = useContext(Context)
 
@@ -20,12 +22,24 @@ export const Good = props => {
 
     const toOrder = () => {
 
-        console.log(currentOrder.stock_id, currentOrder.order_id)
+        if (requesting) return
 
-        rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id + '/' + props.goog.barcode)
+        setRequesting(true)
+
+        rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id + '/' + props.good.barcode,
+            'POST')
             .then(res => {
 
-                console.log(res.body)
+                setRequesting(false)
+
+                const message = res.status === 200
+                    ? 'ок, в заказе!'
+                    : 'ошибка: ' + res.error
+
+                if (Platform.OS === 'android') ToastAndroid.show(message, 5)
+                else alert(message)
+
+                if (res.status === 200) setWo(true)
 
             })
 
@@ -40,7 +54,6 @@ export const Good = props => {
     const makeTitle = ({stock_id, order_id}) => stock_id === app.stock_id
         ? order_id.toString()
         : app.stocks.find(s => s.id === stock_id).name + ', ' + order_id
-
 
     useEffect(() => {
 
@@ -133,22 +146,22 @@ export const Good = props => {
         </Text>
 
 
-        {!props.good.wo && <>
+        {!props.good.wo && !requesting && !wo && <>
 
             {position.is_sale && <View style={styles.rowView}
-                >
-                    <TextInput
-                        style={{
-                            fontSize: fontSize + 8
-                        }}
-                        value={sum}
-                        onChange={v => setSum(v)}
-                        keyboardType="numeric"
-                    />
-                    <Button
-                        onPress={() => toSale()}
-                        title="продать"/>
-                </View>}
+            >
+                <TextInput
+                    style={{
+                        fontSize: fontSize + 8
+                    }}
+                    value={sum}
+                    onChange={v => setSum(v)}
+                    keyboardType="numeric"
+                />
+                <Button
+                    onPress={() => toSale()}
+                    title="продать"/>
+            </View>}
 
             {currentOrder && (<View style={styles.rowView}
             ><Button
