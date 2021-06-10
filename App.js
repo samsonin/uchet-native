@@ -1,6 +1,8 @@
 import {StatusBar} from 'expo-status-bar';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, ListViewComponent, StyleSheet, Text, View} from 'react-native';
+
+import {Camera} from 'expo-camera';
 
 import Context from "./src/context";
 
@@ -42,6 +44,8 @@ export default function App() {
     const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
     const [isRequesting, setIsRequesting] = useState(false)
     const [good, setGood] = useState()
+
+    const [hasPermission, setHasPermission] = useState(null);
 
     const setStockId = id => {
 
@@ -118,6 +122,13 @@ export default function App() {
 
     }
 
+    useEffect(() => {
+        (async () => {
+            const {status} = await Camera.requestPermissionsAsync()
+            setHasPermission(status === 'granted')
+        })();
+    }, []);
+
     return <Context.Provider value={{
         setLoading,
         app,
@@ -147,12 +158,16 @@ export default function App() {
                         />}
 
                         {isBarcodeOpen
-                            ? <BarCodeScanner
-                                // type="front"
-                                // onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                                onBarCodeScanned={handleBarCodeScanned}
-                                style={StyleSheet.absoluteFillObject}
-                            />
+                            ? hasPermission === false
+                                ? <Text>
+                                    No access to camera
+                                </Text>
+                                : <BarCodeScanner
+                                    // type="front"
+                                    // onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                                    onBarCodeScanned={handleBarCodeScanned}
+                                    style={StyleSheet.absoluteFillObject}
+                                />
                             : contentId === 3
                                 ? <Transit/>
                                 : contentId === 5
@@ -162,8 +177,7 @@ export default function App() {
                                         : contentId === 99
                                             ? good && <Good good={good}/>
                                             : <Text>
-                                                main content:
-                                                {contentId}
+                                                Раздел в разработке
                                             </Text>
                         }
 

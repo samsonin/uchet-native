@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {View, TextInput, Button, StyleSheet, Alert} from 'react-native'
+import {View, TextInput, Button, StyleSheet, Alert, Text, Linking} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import rest from "../common/Rest";
 
@@ -134,6 +134,10 @@ export const Auth = props => {
                 disabled={props.isLoading || (!LOGIN && !isLoginValid)}
                 onPress={loginButtonHandler}
         />
+        <Text style={styles.text}
+              onPress={() => Linking.openURL('https://uchet.store')}>
+            Зарегистрироваться
+        </Text>
     </View>
 
 }
@@ -149,8 +153,11 @@ const styles = StyleSheet.create({
         width: '80%',
         borderBottomWidth: 1,
         borderBottomColor: 'darkslateblue',
-        margin: 20,
+        margin: 38,
         // top: 25
+    },
+    text: {
+        color: 'blue',
+        margin: 38,
     }
-
 })

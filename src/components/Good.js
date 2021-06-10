@@ -4,6 +4,7 @@ import {Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View} fro
 import Context from "../context";
 import RBSheet from "react-native-raw-bottom-sheet";
 import rest from '../common/Rest'
+import ActivityIndicator from "./ActivityIndicator";
 
 
 const fontSize = 18
@@ -12,13 +13,28 @@ export const Good = props => {
 
     const [allowedOrders, setAllowedOrders] = useState([])
     const [currentOrder, setCurrentOrder] = useState()
-    const [sum, setSum] = useState(() => props.good.sum.toString())
+    const [sum, setSum] = useState(props.good.sum.toString())
     const [requesting, setRequesting] = useState(false)
     const [wo, setWo] = useState(() => props.good.wo)
 
     const {auth, app} = useContext(Context)
 
     const refRBSheet = useRef()
+
+    const response = (res, okMessage) => {
+
+        setRequesting(false)
+
+        const message = res.status === 200
+            ? okMessage
+            : 'ошибка: ' + res.body.error
+
+        if (Platform.OS === 'android') ToastAndroid.show(message, 5)
+        else alert(message)
+
+        if (res.status === 200) setWo(true)
+
+    }
 
     const toOrder = () => {
 
@@ -28,32 +44,26 @@ export const Good = props => {
 
         rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id + '/' + props.good.barcode,
             'POST')
-            .then(res => {
-
-                setRequesting(false)
-
-                const message = res.status === 200
-                    ? 'ок, в заказе!'
-                    : 'ошибка: ' + res.error
-
-                if (Platform.OS === 'android') ToastAndroid.show(message, 5)
-                else alert(message)
-
-                if (res.status === 200) setWo(true)
-
-            })
+            .then(res => response(res, 'ок, в заказе!'))
 
     }
 
     const toSale = () => {
 
-        console.log(currentOrder.stock_id, props.good.barcode)
+        if (requesting) return
+
+        setRequesting(true)
+
+        rest('sales/' + props.good.barcode + '/' + sum, 'POST')
+            .then(res => response(res, 'ок, продано!'))
 
     }
 
     const makeTitle = ({stock_id, order_id}) => stock_id === app.stock_id
         ? order_id.toString()
         : app.stocks.find(s => s.id === stock_id).name + ', ' + order_id
+
+    const toNumber = v => setSum(prev => +v == v ? v : prev)
 
     useEffect(() => {
 
@@ -73,14 +83,14 @@ export const Good = props => {
 
     const position = app.positions.find(p => p.id === auth.position_id)
 
-    // console.log(position)
-
     let category = app.categories.find(c => c.id === props.good.category_id)
     let categoryName = category
         ? category.name
         : 'не определена'
 
     return <View style={styles.view}>
+
+        {requesting && <ActivityIndicator/>}
 
         <View style={styles.header}>
 
@@ -155,7 +165,7 @@ export const Good = props => {
                         fontSize: fontSize + 8
                     }}
                     value={sum}
-                    onChange={v => setSum(v)}
+                    onChangeText={v => toNumber(v)}
                     keyboardType="numeric"
                 />
                 <Button
