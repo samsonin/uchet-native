@@ -1,10 +1,14 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View} from "react-native";
+import {Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View} from "react-native";
 
 import Context from "../context";
 import RBSheet from "react-native-raw-bottom-sheet";
 import rest from '../common/Rest'
 import ActivityIndicator from "./ActivityIndicator";
+
+import {FontAwesome} from '@expo/vector-icons';
+import {MaterialIcons} from '@expo/vector-icons';
+import {Input} from "react-native-elements";
 
 
 const fontSize = 18
@@ -59,6 +63,48 @@ export const Good = props => {
 
     }
 
+    const toTransit = () => {
+
+        console.log('toTransit')
+
+        setRequesting(true)
+
+        setTimeout(() => {
+
+            setRequesting(false)
+
+        }, 3000)
+
+    }
+
+    const toReject = () => {
+
+        console.log('toReject')
+
+        setRequesting(true)
+
+        setTimeout(() => {
+
+            setRequesting(false)
+
+        }, 3000)
+
+    }
+
+    const toDeduct = () => {
+
+        console.log('toDeduct')
+
+        setRequesting(true)
+
+        setTimeout(() => {
+
+            setRequesting(false)
+
+        }, 3000)
+
+    }
+
     const makeTitle = ({stock_id, order_id}) => stock_id === app.stock_id
         ? order_id.toString()
         : app.stocks.find(s => s.id === stock_id).name + ', ' + order_id
@@ -88,7 +134,12 @@ export const Good = props => {
         ? category.name
         : 'не определена'
 
-    return <View style={styles.view}>
+    let cost = (props.good.remcost || props.good.cost).toString()
+
+    let wf = app.providers.find(p => p.id === props.good.provider_id).name
+
+
+    return <ScrollView style={styles.view}>
 
         {requesting && <ActivityIndicator/>}
 
@@ -98,133 +149,139 @@ export const Good = props => {
                 {'#' + props.good.id}
             </Text>
 
-        </View>
-
-        <Text
-            style={{
-                alignSelf: 'center',
-                fontSize: fontSize
-            }}
-        >
-            {categoryName}
-        </Text>
-
-        <Text
-            style={{
-                alignSelf: 'center',
-                fontSize: fontSize + 4
-            }}
-        >
-            {props.good.model}
-        </Text>
-
-        {!!props.good.imei && <Text
-            style={{
-                alignSelf: 'center',
-                fontSize: fontSize
-            }}
-        >
-            {props.good.imei}
-        </Text>}
-
-        <Text
-            style={{
-                alignSelf: 'center',
-                fontSize: fontSize
-            }}
-        >
-            {'Себестоимость: ' + (props.good.remcost || props.good.cost)}
-        </Text>
-
-        <Text
-            style={{
-                alignSelf: 'center',
-                fontSize: fontSize
-            }}
-        >
-            {'Оприходовали: ' + props.good.time}
-        </Text>
-
-        <Text
-            style={{
-                alignSelf: 'center',
-                fontSize: fontSize,
-                marginBottom: 50
-            }}
-        >
-            {'Поставщик : ' + app.providers.find(p => p.id === props.good.provider_id).name}
-        </Text>
-
-
-        {!props.good.wo && !requesting && !wo && <>
-
-            {position.is_sale && <View style={styles.rowView}
+            {!props.good.wo && !requesting && !wo && <View
+                style={styles.actionIcons}
             >
-                <TextInput
-                    style={{
-                        fontSize: fontSize + 8
-                    }}
-                    value={sum}
-                    onChangeText={v => toNumber(v)}
-                    keyboardType="numeric"
-                />
-                <Button
-                    onPress={() => toSale()}
-                    title="продать"/>
+                <TouchableOpacity
+                    style={styles.actionIcon}
+                    onPress={() => toTransit()}
+                >
+                    <FontAwesome name="truck" size={30} color="blue"/>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.actionIcon}
+                    onPress={() => toReject()}
+                >
+                    <MaterialIcons name="assignment-return" size={30} color="orange"/>
+                </TouchableOpacity>
+
+                {auth.admin && <TouchableOpacity
+                    style={styles.actionIcon}
+                    onPress={() => toDeduct()}
+                >
+                    <MaterialIcons name="delete" size={30} color="red"/>
+                </TouchableOpacity>}
+
             </View>}
 
-            {currentOrder && (<View style={styles.rowView}
-            ><Button
-                title={makeTitle(currentOrder)}
-                onPress={() => refRBSheet.current.open()}
-            />
-                <Button
-                    title="в заказ..."
-                    onPress={() => toOrder()}
-                />
-            </View>)}
+        </View>
 
-            <RBSheet
-                ref={refRBSheet}
-                closeOnDragDown={true}
-                closeOnPressMask={true}
-                height={200}
-            >
-                <ScrollView>
-                    {allowedOrders.map(o => <Button
-                        color="#999"
-                        key={'customerviewrallowedOrders' + o.stock_id + o.order_id}
-                        style={styles.scrollButton}
-                        title={makeTitle(o)}
-                        onPress={() => {
-                            refRBSheet.current.close()
-                            setCurrentOrder(o)
+        <View style={{
+            backgroundColor: 'white',
+            marginTop: 10,
+            borderWidth: 1,
+            borderRadius: 10,
+            opacity: requesting ? .9 : 1
+        }}>
+            {[
+                {label: 'категория', value: categoryName},
+                {label: 'наименование', value: props.good.model},
+                !!props.good.imei && {label: 'наименование', value: props.good.model},
+                {label: 'себестоимость', value: cost},
+                {label: 'оприходовали', value: props.good.time},
+                {label: 'откуда', value: wf},
+            ].map(i => i && <Input
+                key={'inputkeyimgood' + i.label}
+                label={i.label}
+                value={i.value}
+                disabled={requesting}
+            />)}
+
+            {!props.good.wo && !requesting && !wo && <>
+
+                {position.is_sale && <View style={styles.rowView}
+                >
+                    <TextInput
+                        style={{
+                            fontSize: fontSize + 8
                         }}
-                    />)}
-                </ScrollView>
-            </RBSheet>
+                        value={sum}
+                        onChangeText={v => toNumber(v)}
+                        keyboardType="numeric"
+                    />
+                    <Button
+                        onPress={() => toSale()}
+                        title="продать"/>
+                </View>}
 
-        </>}
-    </View>
+                {currentOrder && (<View style={styles.rowView}
+                ><Button
+                    title={makeTitle(currentOrder)}
+                    onPress={() => refRBSheet.current.open()}
+                />
+                    <Button
+                        title="в заказ..."
+                        onPress={() => toOrder()}
+                    />
+                </View>)}
+
+                <RBSheet
+                    ref={refRBSheet}
+                    closeOnDragDown={true}
+                    closeOnPressMask={true}
+                    height={200}
+                >
+                    <ScrollView>
+                        {allowedOrders.map(o => <Button
+                            color="#999"
+                            key={'customerviewrallowedOrders' + o.stock_id + o.order_id}
+                            style={styles.scrollButton}
+                            title={makeTitle(o)}
+                            onPress={() => {
+                                refRBSheet.current.close()
+                                setCurrentOrder(o)
+                            }}
+                        />)}
+                    </ScrollView>
+                </RBSheet>
+
+            </>}
+
+        </View>
+
+    </ScrollView>
 
 }
 
 const styles = StyleSheet.create({
     view: {
         margin: 3,
-        backgroundColor: 'white',
     },
     header: {
-        // flex: 1
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 8,
+        backgroundColor: '#e9dbdb',
     },
     title: {
-        marginLeft: 1,
         fontSize: 30,
+    },
+    actionIcons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        // width: 80,
+    },
+    actionIcon: {
+        marginHorizontal: 4,
     },
     rowView: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 20
+        marginBottom: 20,
+        justifyContent: 'space-around'
     },
     button: {
         margin: 5,

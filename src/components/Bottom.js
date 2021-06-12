@@ -6,17 +6,18 @@ import {TabBarIcon} from './TabBarIcon'
 const icons = [
     {id: 1, text: 'Заказы', name: 'hammer'},
     {id: 2, text: 'Склад', name: 'home'},
-    {id: 3, text: 'Контрагенты', name: 'people'},
-    {id: 4, text: 'Аналитика', name: 'trending-up'},
+    {id: 3, text: 'Сканировать', name: 'barcode'},
+    {id: 4, text: 'Контрагенты', name: 'people'},
+    {id: 5, text: 'Аналитика', name: 'trending-up'},
 ]
 
-export const Bottom = props => {
+export const Bottom = ({subMenu}) => {
 
-    const [focusId, setFocusId] = useState(0);
+    const [focusId, setFocusId] = useState(0)
 
     const handle = i => {
         setFocusId(i)
-        props.subMenu(i)
+        subMenu(i)
     }
 
     return <View style={styles.bottom}>
@@ -43,9 +44,5 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f8f8',
         borderTopWidth: .2,
         borderTopColor: '#9c9c9c',
-    },
-    text: {
-        fontSize: 24,
-        color: 'black',
-    },
+    }
 })

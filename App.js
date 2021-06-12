@@ -79,6 +79,8 @@ export default function App() {
 
     const subMenu = menuId => {
 
+        if (menuId === 3) setIsBarcodeOpen(true)
+
         if (isSubMenuVisible) {
             if (subMenuId === menuId) {
                 setSubMenuVisible(false)

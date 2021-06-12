@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "UchetStore",
-    "slug": "uchetstore",
+    "slug": "uchetstore-simplest-crm",
     "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/uchetStoreIcon.png",
@@ -17,6 +17,8 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.samsonin.uchetstore",
+      "buildNumber": "1.0.0",
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera for barcode scanner only!",
@@ -28,7 +30,8 @@
     },
     "description": "",
     "android": {
-      "package": "com.samsonin.uchetstore"
+      "package": "com.samsonin.uchetstore",
+      "versionCode": 2
     }
   }
 }

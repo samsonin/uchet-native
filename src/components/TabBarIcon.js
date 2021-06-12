@@ -12,11 +12,14 @@ export const TabBarIcon = props => {
     >
         <Ionicons
             name={props.name}
-            size={28}
+            size={34}
             style={{color}}
         />
         <Text
-            style={{color}}
+            style={{
+                fontSize: 10,
+                color
+            }}
         >
             {props.text}
         </Text>
@@ -25,7 +28,7 @@ export const TabBarIcon = props => {
 
 const styles = StyleSheet.create({
     view: {
-        width: '25%',
+        width: '20%',
         height: '100%',
         alignItems: 'center',
     },

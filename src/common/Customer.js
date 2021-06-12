@@ -3,9 +3,9 @@ import rest from './Rest'
 
 import {Button, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
-import Field from "../components/Field";
 import RBSheet from "react-native-raw-bottom-sheet";
 import Context from "../context";
+import {Input} from "react-native-elements";
 
 const types = {
     birthday: 'date',
@@ -136,7 +136,7 @@ export const Customer = props => {
                             Откуда узнали о нас
                         </Text>
                     </TouchableOpacity>
-                    : <Field
+                    : <Input
                         label={field.value}
                         value={customer[field.name]}
                         onChange={() => handleChange(field.name, field.value)}

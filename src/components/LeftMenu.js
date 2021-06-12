@@ -8,18 +8,7 @@ export const LeftMenu = props => {
 
     return <View style={styles.view}>
 
-        <StocksSelect
-            st={styles.button}
-        />
-
-        <FontAwesome.Button
-            // style={styles.button}
-            name={'barcode'}
-            backgroundColor={"#0c8098"}
-            onPress={() => props.setIsBarcodeOpen(true)}
-        >
-            Сканировать
-        </FontAwesome.Button>
+        <StocksSelect />
 
     </View>
 }
@@ -35,9 +24,4 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         padding: 2,
     },
-    button: {
-        // borderColor: '#9c9c9c',
-        // borderWidth: 1,
-        // margin: 2,
-    }
 })
