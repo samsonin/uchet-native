@@ -1,6 +1,7 @@
 import React, {useContext, useRef} from 'react';
-import {Button, ScrollView, StyleSheet, Text} from "react-native";
+import {Button, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
+import {Ionicons} from '@expo/vector-icons';
 
 import Context from "../context";
 
@@ -28,16 +29,31 @@ export const StocksSelect = props => {
 
     }
 
-    return app.stocks
-        ? <>
-            <Button
-                slyle={props.st}
-                title={app.stock_id
-                    ? app.stocks.find(s => s.id === app.stock_id).name
-                    : 'выбрать точку...'}
-                onPress={() => refRBSheet.current.open()}
-                disabled={!!app.stock_id}
-            />
+    return app.stock_id
+        ? <View style={{
+            flexDirection: 'row',
+            padding: 3,
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderRadius: 8
+        }}>
+            <Text>
+                {app.stocks.find(s => s.id === app.stock_id).name}
+            </Text>
+            <TouchableOpacity style={{
+                margin: 8
+            }}
+                              onPress={() => setStockId()}
+            >
+                <Ionicons name="exit-outline" size={24} color="black"/>
+            </TouchableOpacity>
+        </View>
+        : <><Button
+            title={'выбрать точку...'}
+            onPress={() => refRBSheet.current.open()}
+            disabled={!!app.stock_id}
+        />
             <RBSheet
                 ref={refRBSheet}
                 closeOnDragDown={true}
@@ -55,12 +71,11 @@ export const StocksSelect = props => {
                 </ScrollView>
             </RBSheet>
         </>
-        : <Text>Загрузка...</Text>
 
 }
 
 const styles = StyleSheet.create({
-    scrollButton: {
-        color: '#234234'
-    }
+    // scrollButton: {
+    //     color: '#234234'
+    // }
 })

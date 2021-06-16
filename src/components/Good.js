@@ -149,7 +149,7 @@ export const Good = props => {
                 {'#' + props.good.id}
             </Text>
 
-            {!props.good.wo && !requesting && !wo && <View
+            {!props.good.wo && !requesting && !wo && !!position.is_sale && <View
                 style={styles.actionIcons}
             >
                 <TouchableOpacity
@@ -200,22 +200,24 @@ export const Good = props => {
 
             {!props.good.wo && !requesting && !wo && <>
 
-                {position.is_sale && <View style={styles.rowView}
-                >
-                    <TextInput
-                        style={{
-                            fontSize: fontSize + 8
-                        }}
-                        value={sum}
-                        onChangeText={v => toNumber(v)}
-                        keyboardType="numeric"
-                    />
-                    <Button
-                        onPress={() => toSale()}
-                        title="продать"/>
-                </View>}
+                {position.is_sale
+                    ? <View style={styles.rowView}
+                    >
+                        <TextInput
+                            style={{
+                                fontSize: fontSize + 8
+                            }}
+                            value={sum}
+                            onChangeText={v => toNumber(v)}
+                            keyboardType="numeric"
+                        />
+                        <Button
+                            onPress={() => toSale()}
+                            title="продать"/>
+                    </View>
+                    : null}
 
-                {currentOrder && (<View style={styles.rowView}
+                {currentOrder && <View style={styles.rowView}
                 ><Button
                     title={makeTitle(currentOrder)}
                     onPress={() => refRBSheet.current.open()}
@@ -224,31 +226,32 @@ export const Good = props => {
                         title="в заказ..."
                         onPress={() => toOrder()}
                     />
-                </View>)}
-
-                <RBSheet
-                    ref={refRBSheet}
-                    closeOnDragDown={true}
-                    closeOnPressMask={true}
-                    height={200}
-                >
-                    <ScrollView>
-                        {allowedOrders.map(o => <Button
-                            color="#999"
-                            key={'customerviewrallowedOrders' + o.stock_id + o.order_id}
-                            style={styles.scrollButton}
-                            title={makeTitle(o)}
-                            onPress={() => {
-                                refRBSheet.current.close()
-                                setCurrentOrder(o)
-                            }}
-                        />)}
-                    </ScrollView>
-                </RBSheet>
+                </View>}
 
             </>}
 
         </View>
+
+        <RBSheet
+            ref={refRBSheet}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            height={200}
+        >
+            <ScrollView>
+                {allowedOrders.map(o => <Button
+                    color="#999"
+                    key={'customerviewrallowedOrders' + o.stock_id + o.order_id}
+                    style={styles.scrollButton}
+                    title={makeTitle(o)}
+                    onPress={() => {
+                        refRBSheet.current.close()
+                        setCurrentOrder(o)
+                    }}
+                />)}
+            </ScrollView>
+        </RBSheet>
+
 
     </ScrollView>
 

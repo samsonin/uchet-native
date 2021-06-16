@@ -8,7 +8,7 @@ const items = [
         {id: 1, title: 'Все заказы'},
     ],
     [
-        {id: 2, title: 'Склад'},
+        {id: 2, title: 'Накладные'},
         {id: 3, title: 'Транзит'},
         {id: 4, title: 'Брак'},
     ],

@@ -22,19 +22,13 @@ import {Customers} from "./src/components/Customers";
 import {Daily} from "./src/components/Daily";
 import {BarCodeScanner} from "expo-barcode-scanner";
 import {Good} from "./src/components/Good";
+import {Orders} from "./src/components/Orders";
+import {Consignments} from "./src/components/Consignments";
 
 export default function App() {
 
-    const initialAuth = {
-        user_id: 0,
-        jwt: '',
-        organization_id: 0,
-        admin: false,
-        expiration_time: 0,
-    }
-
-    const [auth, setAuth] = useState(initialAuth);
-    const [app, setApp] = useState({})
+    const [auth, setAuth] = useState();
+    const [app, setApp] = useState()
     const [isLoading, setLoading] = useState(false);
     const [contentId, setContentId] = useState(0);
     const [isSubMenuVisible, setSubMenuVisible] = useState(false);
@@ -49,6 +43,8 @@ export default function App() {
 
     const setStockId = id => {
 
+        setIsLeftMenuShow(false)
+
         setApp(prev => {
 
             let newApp = {...prev}
@@ -61,14 +57,20 @@ export default function App() {
 
     }
 
+    const updApp = props => {
+
+        console.log(props)
+
+    }
+
     const accountMenuHandler = () => {
         setAccountMenuShow(!isAccountMenuShow)
     }
 
     const setInitialAuth = () => {
         setAccountMenuShow(false)
-        setAuth(initialAuth)
-        setApp({})
+        setAuth()
+        setApp()
     }
 
     const leftMenuHandler = () => {
@@ -131,89 +133,97 @@ export default function App() {
         })();
     }, []);
 
-    return <Context.Provider value={{
-        setLoading,
-        app,
-        setStockId,
-        auth
-    }}>
-        <View style={styles.container}>
-            <Header
-                isAuth={auth.user_id > 0}
-                leftMenuHandler={leftMenuHandler}
-                accountMenuHandler={accountMenuHandler}
-            />
+    const emptyView = text => <View style={styles.emptyView}>
+        <Text>
+            {text}
+        </Text>
+    </View>
 
-            {isLoading && <ActivityIndicator/>}
 
-            {auth.user_id > 0
-                ? <>
-                    <View style={styles.content}>
+    return auth
+        ? < Context.Provider
+            value={{
+                setLoading,
+                app,
+                setStockId,
+                auth
+            }}>
+            <View
+                style={styles.container}>
+                < Header
+                    isAuth={auth.user_id > 0}
+                    leftMenuHandler={leftMenuHandler}
+                    accountMenuHandler={accountMenuHandler}
+                />
 
-                        {isLeftMenuShow && !isBarcodeOpen && <LeftMenu
-                            close={() => setIsLeftMenuShow(false)}
-                            setIsBarcodeOpen={setIsBarcodeOpen}
+                {app
+                    ? <>
+                        <View style={styles.content}>
+
+                            {isLeftMenuShow && !isBarcodeOpen && <LeftMenu
+                                close={() => setIsLeftMenuShow(false)}
+                                setIsBarcodeOpen={setIsBarcodeOpen}
+                            />}
+
+                            {isAccountMenuShow && !isBarcodeOpen && <AccountMenu
+                                setInitialAuth={setInitialAuth}
+                            />}
+
+                            {isBarcodeOpen
+                                ? hasPermission === false
+                                    ? emptyView('Нет доступа к камере')
+                                    : <BarCodeScanner
+                                        // type="front"
+                                        // onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                                        onBarCodeScanned={handleBarCodeScanned}
+                                        style={StyleSheet.absoluteFillObject}
+                                    />
+                                : contentId === 1
+                                    ? <Orders/>
+                                    : contentId === 2
+                                        ? app.stock_id
+                                            ? <Consignments/>
+                                            : emptyView('Выберите точку')
+                                        : contentId === 3
+                                            ? <Transit/>
+                                            : contentId === 5
+                                                ? <Customers/>
+                                                : contentId === 8
+                                                    ? <Daily/>
+                                                    : contentId === 99
+                                                        ? good && <Good good={good}/>
+                                                        : emptyView('Раздел в разработке')
+                            }
+
+                            {isSubMenuVisible && !isBarcodeOpen && <SubMenu
+                                id={subMenuId}
+                                setContentId={setContentId}
+                                setSubMenuVisible={setSubMenuVisible}
+                            />}
+
+                        </View>
+                        {isBarcodeOpen && <Button style={styles.scannerCancelButton}
+                                                  title='отмена'
+                                                  onPress={() => setIsBarcodeOpen(false)}
+                                                  color="red"
                         />}
 
-                        {isAccountMenuShow && !isBarcodeOpen && <AccountMenu
-                            setInitialAuth={setInitialAuth}
-                        />}
-
-                        {isBarcodeOpen
-                            ? hasPermission === false
-                                ? <Text>
-                                    No access to camera
-                                </Text>
-                                : <BarCodeScanner
-                                    // type="front"
-                                    // onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                                    onBarCodeScanned={handleBarCodeScanned}
-                                    style={StyleSheet.absoluteFillObject}
-                                />
-                            : contentId === 3
-                                ? <Transit/>
-                                : contentId === 5
-                                    ? <Customers/>
-                                    : contentId === 8
-                                        ? <Daily/>
-                                        : contentId === 99
-                                            ? good && <Good good={good}/>
-                                            : <Text>
-                                                Раздел в разработке
-                                            </Text>
-                        }
-
-                        {isSubMenuVisible && !isBarcodeOpen && <SubMenu
-                            id={subMenuId}
+                        <Bottom
                             setContentId={setContentId}
-                            setSubMenuVisible={setSubMenuVisible}
-                        />}
+                            subMenu={subMenu}
+                        />
+                    </>
+                    : <ActivityIndicator/>}
 
-                    </View>
-                    {isBarcodeOpen && <Button style={styles.scannerCancelButton}
-                                              title='отмена'
-                                              onPress={() => setIsBarcodeOpen(false)}
-                                              color="red"
-                    />}
-                </>
-                : <Auth auth={auth}
-                        setAuth={setAuth}
-                        setApp={setApp}
-                        isLoading={isLoading}
-                        setLoading={setLoading}
-                />
-            }
-
-            {auth.user_id > 0
-                ? <Bottom
-                    setContentId={setContentId}
-                    subMenu={subMenu}
-                />
-                : null}
-
-            <StatusBar style="auto"/>
-        </View>
-    </Context.Provider>
+            </View>
+        </Context.Provider>
+        : <Auth auth={auth}
+                setAuth={setAuth}
+                setApp={setApp}
+                updApp={updApp}
+                isLoading={isLoading}
+                setLoading={setLoading}
+        />
 }
 
 const styles = StyleSheet.create({
@@ -230,5 +240,10 @@ const styles = StyleSheet.create({
     scannerCancelButton: {
         alignSelf: 'flex-end',
         marginBottom: 20
-    }
+    },
+    emptyView: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginVertical: '50%'
+    },
 })

@@ -3,7 +3,7 @@ import {View, TextInput, Button, StyleSheet, Alert, Text, Linking} from 'react-n
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import rest from "../common/Rest";
 
-import {LOGIN, PASS} from "@env"
+import {LOGIN, PASS, RUSTAM, OLYA} from "@env"
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
@@ -81,6 +81,8 @@ export const Auth = props => {
 
                 try {
 
+                    // jwt = OLYA || jwt
+
                     let payload = parseJwt(jwt);
                     payload.jwt = jwt;
                     props.setAuth(payload);
@@ -105,6 +107,59 @@ export const Auth = props => {
                     Alert.alert('Ошибка', 'Неправильный логин или пароль')
                 }
 
+                try {
+
+                    let ws = new WebSocket('wss://appblog.ru:3333/' + jwt);
+
+                    ws.onmessage = response => {
+
+                        console.log('onmessage')
+                        console.log(response);
+
+                        if (!response.isTrusted) return true;
+
+                        let data = decodeURIComponent(response.data);
+                        try {
+                            data = JSON.parse(data);
+
+                            if (typeof (data) !== "object") throw(console.error());
+
+                            if (data.type === undefined) {
+
+                                props.updApp(data);
+
+                            } else if (data.type === "notification") {
+
+                                console.log(data.text)
+
+                            } else if (data.type === 'check_zp') {
+                            } else if (data.type === 'testConnection') {
+                                ws.send('test')
+                            }
+
+                        } catch {
+
+                        }
+
+
+                    }
+
+                    ws.onerror = (e) => {
+                        // an error occurred
+                        console.log('onerror')
+                        console.log(e.message);
+                    };
+
+                    ws.onclose = (e) => {
+                        // connection closed
+                        console.log('onclose')
+                        console.log(e.code, e.reason);
+                    };
+
+                } catch (e) {
+                    console.error("ws " + e)
+                }
+
 
             })
             .catch(error => {
@@ -118,27 +173,26 @@ export const Auth = props => {
     }
 
     return <View style={styles.auth}>
-        <TextInput style={styles.input}
-                   placeholder={'Номер телефона или email'}
-                   onChangeText={text => loginValidator(text)}
-                   value={login}
-                   disableFullscreenUI={props.isLoading}
-        />
-        <TextInput style={styles.input}
-                   placeholder={'Пароль'}
-                   secureTextEntry
-                   onChangeText={text => setPassword(text)}
-                   value={password}
-        />
-        <Button title='Войти'
-                disabled={props.isLoading || (!LOGIN && !isLoginValid)}
-                onPress={loginButtonHandler}
-        />
-        <Text style={styles.text}
-              onPress={() => Linking.openURL('https://uchet.store')}>
-            Зарегистрироваться
-        </Text>
-    </View>
+            <TextInput style={styles.input}
+                       placeholder={'Номер телефона или email'}
+                       onChangeText={text => loginValidator(text)}
+                       value={login}
+                       disableFullscreenUI={props.isLoading}
+            />
+            <TextInput style={styles.input}
+                       placeholder={'Пароль'}
+                       secureTextEntry
+                       onChangeText={text => setPassword(text)}
+                       value={password}
+            />
+            <Button title='Войти'
+                    disabled={props.isLoading || (!LOGIN && !isLoginValid)}
+                    onPress={loginButtonHandler}
+            />
+            <Button title='Зарегистрироваться'
+                    onPress={() => Linking.openURL('https://uchet.store')}
+            />
+        </View>
 
 }
 
@@ -146,7 +200,8 @@ const styles = StyleSheet.create({
     auth: {
         paddingTop: 120,
         flexDirection: 'column',
-        alignItems: 'center',
+        // justifyContent: 'space-around',
+        // alignItems: 'center',
     },
     input: {
         fontSize: 20,
@@ -156,8 +211,4 @@ const styles = StyleSheet.create({
         margin: 38,
         // top: 25
     },
-    text: {
-        color: 'blue',
-        margin: 38,
-    }
 })

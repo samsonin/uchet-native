@@ -20,8 +20,8 @@ const styles = StyleSheet.create({
         left: 10,
         top: 10,
         backgroundColor: '#f8f8f8',
-        width: '50%',
+        width: '65%',
         alignSelf: 'flex-end',
-        padding: 2,
+        // padding: 2,
     },
 })
