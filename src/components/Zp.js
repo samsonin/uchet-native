@@ -1,10 +1,10 @@
 import React from "react";
 import {StyleSheet, Text, View} from "react-native";
 
-export const Daily = () => {
+export const Zp = () => {
 
     return <View style={styles.emptyView}>
-        <Text>Данные за сегодня отсутствуют</Text>
+        <Text>К сожалению, Вы ничего не заработали</Text>
     </View>
 }
 

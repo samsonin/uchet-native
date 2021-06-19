@@ -20,6 +20,7 @@ import {Customer} from "./src/common/Customer";
 import {Transit} from "./src/components/Transit";
 import {Customers} from "./src/components/Customers";
 import {Daily} from "./src/components/Daily";
+import {Zp} from "./src/components/Zp";
 import {BarCodeScanner} from "expo-barcode-scanner";
 import {Good} from "./src/components/Good";
 import {Orders} from "./src/components/Orders";
@@ -41,27 +42,15 @@ export default function App() {
 
     const [hasPermission, setHasPermission] = useState(null);
 
-    const setStockId = id => {
+    const setStockId = stock_id => {
 
         setIsLeftMenuShow(false)
 
-        setApp(prev => {
-
-            let newApp = {...prev}
-
-            newApp.stock_id = id
-
-            return newApp
-
-        })
+        updApp({stock_id})
 
     }
 
-    const updApp = props => {
-
-        console.log(props)
-
-    }
+    const updApp = props => setApp(prev => ({...prev, ...props}))
 
     const accountMenuHandler = () => {
         setAccountMenuShow(!isAccountMenuShow)
@@ -146,6 +135,7 @@ export default function App() {
                 setLoading,
                 app,
                 setStockId,
+                updApp,
                 auth
             }}>
             <View
@@ -190,9 +180,11 @@ export default function App() {
                                                 ? <Customers/>
                                                 : contentId === 8
                                                     ? <Daily/>
-                                                    : contentId === 99
-                                                        ? good && <Good good={good}/>
-                                                        : emptyView('Раздел в разработке')
+                                                    : contentId === 9
+                                                        ? <Zp/>
+                                                        : contentId === 99
+                                                            ? good && <Good good={good} setGood={setGood}/>
+                                                            : emptyView('Добро пожаловать!')
                             }
 
                             {isSubMenuVisible && !isBarcodeOpen && <SubMenu

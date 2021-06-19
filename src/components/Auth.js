@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {View, TextInput, Button, StyleSheet, Alert, Text, Linking} from 'react-native'
+import {View, TextInput, Button, StyleSheet, Alert, Text, Linking, Platform, ToastAndroid} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import rest from "../common/Rest";
 
@@ -113,12 +113,14 @@ export const Auth = props => {
 
                     ws.onmessage = response => {
 
-                        console.log('onmessage')
-                        console.log(response);
+                        // console.log('onmessage')
+                        // console.log(response);
 
-                        if (!response.isTrusted) return true;
+                        // if (!response.isTrusted) return true;
+
 
                         let data = decodeURIComponent(response.data);
+
                         try {
                             data = JSON.parse(data);
 
@@ -139,6 +141,8 @@ export const Auth = props => {
 
                         } catch {
 
+                            console.log('error in json parse')
+
                         }
 
 
@@ -152,8 +156,16 @@ export const Auth = props => {
 
                     ws.onclose = (e) => {
                         // connection closed
-                        console.log('onclose')
-                        console.log(e.code, e.reason);
+                        // console.log('onclose')
+                        // console.log(e.code, e.reason);
+
+                        // if (Platform.OS === "android") {
+                        //
+                        //     ToastAndroid.show('onclose' + e.reason, 5)
+                        //
+                        // }
+
+
                     };
 
                 } catch (e) {
@@ -173,18 +185,19 @@ export const Auth = props => {
     }
 
     return <View style={styles.auth}>
-            <TextInput style={styles.input}
-                       placeholder={'Номер телефона или email'}
-                       onChangeText={text => loginValidator(text)}
-                       value={login}
-                       disableFullscreenUI={props.isLoading}
-            />
-            <TextInput style={styles.input}
-                       placeholder={'Пароль'}
-                       secureTextEntry
-                       onChangeText={text => setPassword(text)}
-                       value={password}
-            />
+        <TextInput style={styles.input}
+                   placeholder={'Номер телефона или email'}
+                   onChangeText={text => loginValidator(text)}
+                   value={login}
+                   disableFullscreenUI={props.isLoading}
+        />
+        <TextInput style={styles.input}
+                   placeholder={'Пароль'}
+                   secureTextEntry
+                   onChangeText={text => setPassword(text)}
+                   value={password}
+        />
+        <View style={styles.buttons}>
             <Button title='Войти'
                     disabled={props.isLoading || (!LOGIN && !isLoginValid)}
                     onPress={loginButtonHandler}
@@ -193,22 +206,26 @@ export const Auth = props => {
                     onPress={() => Linking.openURL('https://uchet.store')}
             />
         </View>
+    </View>
 
 }
 
 const styles = StyleSheet.create({
     auth: {
-        paddingTop: 120,
+        flex: 1,
+        paddingTop: 150,
+        paddingHorizontal: '14%',
         flexDirection: 'column',
-        // justifyContent: 'space-around',
-        // alignItems: 'center',
     },
     input: {
         fontSize: 20,
-        width: '80%',
+        // width: '80%',
         borderBottomWidth: 1,
         borderBottomColor: 'darkslateblue',
-        margin: 38,
-        // top: 25
+        marginVertical: 38,
     },
+    buttons: {
+        height: 120,
+        justifyContent: 'space-around',
+    }
 })

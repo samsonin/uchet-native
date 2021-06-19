@@ -32,7 +32,7 @@ export const Consignments = props => {
 
     const del = ({provider_id, consignment_number}) => {
 
-        console.log(provider_id, consignment_number)
+        // console.log(provider_id, consignment_number)
 
         rest('consignments/' + provider_id + '/' + consignment_number, 'DELETE')
             .then(res => {
@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginVertical: '50%'
     },
-
     cons: {
         flexDirection: 'row',
         justifyContent: 'space-between',

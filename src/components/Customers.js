@@ -7,20 +7,21 @@ import rest from '../common/Rest'
 import ActivityIndicator from './ActivityIndicator'
 import {Customer} from "../common/Customer";
 
-let request = false;
 
 export const Customers = () => {
 
     const [searchStr, setSearchStr] = useState()
     const [customers, setCustomers] = useState(false)
     const [id, setId] = useState()
+    const [requesting, setRequesting] = useState(false)
 
     const searchHandler = text => {
 
         setSearchStr(text)
 
-        if (!request) {
-            request = true;
+        if (!requesting) {
+
+            setRequesting(true)
 
             let url = text
                 ? 'customers?all=' + text
@@ -29,15 +30,13 @@ export const Customers = () => {
             rest(url)
                 .then(res => {
                     if (res.ok) setCustomers(res.body);
-                    request = false;
+                    setRequesting(false)
                 })
         }
 
     }
 
-    if (!request && !customers) {
-        searchHandler();
-    }
+    if (!requesting && !customers) searchHandler();
 
     return Number.isInteger(id)
         ? <Customer id={id} setId={setId}/>
@@ -58,9 +57,7 @@ export const Customers = () => {
                         onPress={() => setId(0)}
                     >
                         <Ionicons
-                            name={(Platform.OS === 'ios'
-                                    ? 'ios'
-                                    : 'md') + '-person-add'}
+                            name={(Platform.OS === 'ios' ? 'ios' : 'md') + '-person-add'}
                             size={24}
                             color="black"
                         />
@@ -83,7 +80,10 @@ export const Customers = () => {
                     />
                 </View>
 
-                <ScrollView>
+                <ScrollView
+                    onScrollToTop={() => console.log('onScrollToTop')}
+                    // onScroll={() => console.log('onScroll')}
+                >
                     {customers.map(c => <TouchableOpacity
                             style={styles.touchable}
                             key={'touchopaccustomerskey' + c.id}
@@ -111,6 +111,11 @@ export const Customers = () => {
 const styles = StyleSheet.create({
     view: {
         flex: 1,
+        backgroundColor: "white",
+        padding: 8,
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: 'black'
     },
     title: {
         flexDirection: 'row',
@@ -138,10 +143,10 @@ const styles = StyleSheet.create({
     touchable: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        marginVertical: 3,
+        marginVertical: 8,
     },
     fio: {
-        width: '60%',
+        width: '70%',
     },
     phone: {
         marginLeft: 8,

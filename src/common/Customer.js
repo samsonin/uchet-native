@@ -3,6 +3,8 @@ import rest from './Rest'
 
 import {Button, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import ActivityIndicator from "../components/ActivityIndicator";
+
 import RBSheet from "react-native-raw-bottom-sheet";
 import Context from "../context";
 import {Input} from "react-native-elements";
@@ -17,8 +19,8 @@ export const Customer = props => {
     const [isRequesting, setRequesting] = useState(false)
     const [serverCustomer, setServerCustomer] = useState({})
     const [customer, setCustomer] = useState({})
-
     const [isDetails, setDetails] = useState(false)
+
     const {app} = useContext(Context)
     const refRBSheet = useRef();
 
@@ -41,29 +43,22 @@ export const Customer = props => {
     }
 
     const update = () => {
+
         setRequesting(true)
+
         rest('customers/' + customer.id,
             'PUT',
             customer
         )
             .then(res => {
-                if (res.ok) initial(res.body.customers[0])
                 setRequesting(false)
+                if (res.ok) initial(res.body.customers[0])
             })
     }
 
-    const reset = () => {
-        setCustomer({...serverCustomer})
-    }
+    const reset = () => setCustomer({...serverCustomer})
 
-    const handleChange = (name, value) => {
-
-        console.log(name, value)
-
-        let newCustomer = {...customer}
-        newCustomer[name] = value
-        setCustomer(newCustomer)
-    }
+    const handleChange = (name, value) => setCustomer(prev => ({...prev, [name]: value}))
 
     let id = props.id || 0;
 
@@ -78,9 +73,13 @@ export const Customer = props => {
 
     }
 
-    // let isEqual = JSON.stringify(serverCustomer) === JSON.stringify(customer)
+    const isEqual = JSON.stringify(serverCustomer) === JSON.stringify(customer)
 
-    return <View>
+    return <View
+        style={styles.view}
+    >
+
+        {isRequesting && <ActivityIndicator/>}
 
         <View
             style={styles.controls}
@@ -90,14 +89,9 @@ export const Customer = props => {
                 onPress={() => props.setId('')}
             >
                 <Ionicons
-
-                    name={
-                        (Platform.OS === 'ios'
-                            ? 'ios'
-                            : 'md') + '-arrow-back'
-                    }
+                    name={(Platform.OS === 'ios' ? 'ios' : 'md') + '-chevron-back-outline'}
                     size={24}
-                    color="black"
+                    color={Platform.OS === 'ios' ? "blue" : "black"}
                 />
 
             </TouchableOpacity>
@@ -111,16 +105,14 @@ export const Customer = props => {
                         : 'expand-more'
                     }
                     size={24}
-                    color="black"
+                    color={Platform.OS === 'ios' ? "blue" : "black"}
                 />
 
             </TouchableOpacity>
 
         </View>
 
-        <ScrollView
-            style={styles.list}
-        >
+        <ScrollView>
             {typeof app.fields === 'object' && app.fields.allElements
                 .filter(field => field.index === 'customer' && field.is_valid)
                 .filter(field => isDetails || ['fio', 'phone_number'].includes(field.name))
@@ -139,20 +131,30 @@ export const Customer = props => {
                     : <Input
                         label={field.value}
                         value={customer[field.name]}
-                        onChange={() => handleChange(field.name, field.value)}
+                        onChangeText={text => handleChange(field.name, text)}
                         field={field}
                         key={'custfielviewkey' + field.id}
+                        disabled={isRequesting}
                     />)}
         </ScrollView>
 
-        <View
+        {isEqual || isRequesting || <View
             style={styles.buttons}
         >
             <Button
-                title={'Отмена'} onPress={() => reset()}/>
-            <Button
-                title={'Сохранить'} onPress={() => update()}/>
-        </View>
+                title="Отмена"
+                onPress={() => reset()}
+            />
+            {props.id > 0
+            ? <Button
+                title="Сохранить"
+                onPress={() => update()}
+            />
+            : <Button
+                title="Создать"
+                onPress={() => create()}
+            />}
+        </View>}
 
         <RBSheet
             ref={refRBSheet}
@@ -174,15 +176,20 @@ export const Customer = props => {
 }
 
 const styles = StyleSheet.create({
+    view: {
+        backgroundColor: "white",
+        margin: 2,
+        padding: 8,
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: 'black'
+    },
     controls: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        height: 40,
-        marginTop: 8,
-        marginHorizontal: 10,
-    },
-    list: {
-        backgroundColor: '#FFF',
+        alignItems: 'center',
+        padding: 14,
+        marginBottom: 14,
     },
     buttons: {
         flexDirection: 'row',

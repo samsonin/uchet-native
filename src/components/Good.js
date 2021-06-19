@@ -36,7 +36,7 @@ export const Good = props => {
         if (Platform.OS === 'android') ToastAndroid.show(message, 5)
         else alert(message)
 
-        if (res.status === 200) setWo(true)
+        if (res.status === 200) props.setGood()
 
     }
 
@@ -63,17 +63,14 @@ export const Good = props => {
 
     }
 
-    const toTransit = () => {
-
-        console.log('toTransit')
+    const transit = isTo => {
 
         setRequesting(true)
 
-        setTimeout(() => {
-
-            setRequesting(false)
-
-        }, 3000)
+        rest('transit/' + app.stock_id + '/' + props.good.barcode ,
+            isTo ? 'POST' : 'DELETE')
+            .then(res => response(res, isTo ? 'ок, в транзите' : 'ок, в магазине'))
+            .then(_ => setWo(false))
 
     }
 
@@ -149,12 +146,19 @@ export const Good = props => {
                 {'#' + props.good.id}
             </Text>
 
+            {props.good.wo === 't' && <TouchableOpacity
+                style={styles.actionIcon}
+                onPress={() => transit(false)}
+            >
+                <FontAwesome name="truck" size={30} color="blue"/>
+            </TouchableOpacity>}
+
             {!props.good.wo && !requesting && !wo && !!position.is_sale && <View
                 style={styles.actionIcons}
             >
                 <TouchableOpacity
                     style={styles.actionIcon}
-                    onPress={() => toTransit()}
+                    onPress={() => transit(true)}
                 >
                     <FontAwesome name="truck" size={30} color="blue"/>
                 </TouchableOpacity>

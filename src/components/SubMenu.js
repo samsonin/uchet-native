@@ -4,24 +4,24 @@ import {Button, View, StyleSheet, TouchableOpacity} from "react-native";
 
 const items = [
     [
-        {id: 0, title: 'Новый заказ'},
+        // {id: 0, title: 'Новый заказ'},
         {id: 1, title: 'Все заказы'},
     ],
     [
         {id: 2, title: 'Накладные'},
         {id: 3, title: 'Транзит'},
-        {id: 4, title: 'Брак'},
+        // {id: 4, title: 'Брак'},
     ],
     [],
     [
         {id: 5, title: 'Физ. лица'},
-        {id: 6, title: 'Юр. лица'},
-        {id: 7, title: 'Записи разговоров'},
+        // {id: 6, title: 'Юр. лица'},
+        // {id: 7, title: 'Записи разговоров'},
     ],
     [
         {id: 8, title: 'Ежедневный отчет'},
         {id: 9, title: 'Зарплата'},
-        {id: 10, title: 'Движение денег'},
+        // {id: 10, title: 'Движение денег'},
     ],
 ]
 

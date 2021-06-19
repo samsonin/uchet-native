@@ -1,10 +1,9 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 import rest from '../common/Rest'
 import Context from "../context";
 import ActivityIndicator from './ActivityIndicator';
-import {Ionicons, MaterialIcons} from '@expo/vector-icons';
 
 
 export const Orders = props => {

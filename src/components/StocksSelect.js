@@ -22,10 +22,10 @@ export const StocksSelect = props => {
         setStockId(allowedStocks[0].id)
     }
 
-    const scrollButtonHandler = id => {
+    const scrollButtonHandler = stock_id => {
 
         refRBSheet.current.close()
-        setStockId(id)
+        setStockId(stock_id)
 
     }
 
@@ -44,7 +44,7 @@ export const StocksSelect = props => {
             <TouchableOpacity style={{
                 margin: 8
             }}
-                              onPress={() => setStockId()}
+                              onPress={() => updApp({stock_id: null})}
             >
                 <Ionicons name="exit-outline" size={24} color="black"/>
             </TouchableOpacity>

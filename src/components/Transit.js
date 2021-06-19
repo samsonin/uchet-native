@@ -1,17 +1,161 @@
-import React, {useContext} from "react";
-import {Text} from "react-native";
+import React, {useContext, useEffect, useState} from "react";
+import {ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View} from "react-native";
 
 import Context from "../context";
+import ActivityIndicator from "./ActivityIndicator";
+import {Ionicons} from "@expo/vector-icons";
 
+import rest from '../common/Rest'
+import {TransitItemInfo} from './TransitItemInfo'
 
 export const Transit = () => {
 
-    const {app} = useContext(Context)
+    const [requesting, setRequesting] = useState(false)
+    const [details, setDetails] = useState()
 
-    let user = app.users.find(u => u.id === 4)
+    const {app, updApp} = useContext(Context)
 
-    console.log()
+    const fromTransit = good => {
 
-    return <Text>Transit</Text>
+        if (requesting) return
+
+        setRequesting(true)
+
+        rest('transit/' + app.stock_id + '/' + good.barcode, 'DELETE')
+            .then(res => {
+
+                setRequesting(false)
+
+
+
+                if (res.status === 200) {
+
+                    updApp(res.body)
+
+                    const message = 'ok'
+
+                    if (Platform.OS === 'android') ToastAndroid.show(message, 5)
+                    else alert(message)
+
+                    setDetails(null)
+
+                } else {
+
+                    console.log(res)
+
+                }
+
+            })
+    }
+
+    const renderTransitItem = good => <View
+        key={'gooditemintransitviekey' + good.barcode}
+        style={styles.item}
+    >
+
+        <Text style={styles.text}>
+            {good.model}
+        </Text>
+
+        <View style={styles.actionIcons}>
+            <TouchableOpacity
+                disabled={requesting}
+                onPress={() => setDetails(good.barcode)}
+                style={styles.icon}
+            >
+                {Platform.OS === 'ios'
+                    ? <Ionicons name="ios-information-circle-outline" size={24} color="blue"/>
+                    : <Ionicons name="md-information-circle-outline" size={24} color="black"/>}
+            </TouchableOpacity>
+
+            {!app.stock_id || <TouchableOpacity
+                disabled={requesting}
+                style={styles.icon}
+                onPress={() => fromTransit(good)}
+            >
+                {Platform.OS === 'ios'
+                    ? <Ionicons name="ios-checkmark-circle-outline" size={24} color="blue"/>
+                    : <Ionicons name="md-checkmark-circle-outline" size={24} color="black"/>}
+            </TouchableOpacity>}
+        </View>
+
+    </View>
+
+    const goodDetails = app.transit.find(t => t.barcode === details)
+
+    useEffect(() => {
+
+        if (!goodDetails) setDetails()
+
+    }, [app.transit])
+
+
+    return app.transit.length > 0
+        ? <ScrollView style={styles.view}>
+
+            {requesting && <ActivityIndicator/>}
+
+            <View style={{
+                opacity: requesting ? .6 : 1
+            }}>
+                {goodDetails
+                    ? <TransitItemInfo
+                        good={goodDetails}
+                        setDetails={setDetails}
+                        fromTransit={fromTransit}
+                    />
+                    : app.transit.map(good => {
+
+                        good.id = +good.barcode.toString().substr(6, 6)
+                        let stock = app.stocks.find(st => st.id === good.stock_id)
+                        let user = app.users.find(u => u.id === good.responsible_id)
+
+                        good.stock = stock
+                            ? stock.name
+                            : ''
+
+                        good.user = user
+                            ? user.name
+                            : ''
+
+                        return renderTransitItem(good)
+
+                    })}
+            </View>
+        </ScrollView>
+        : <View style={styles.emptyView}>
+            <Text>В транзите ничего нет</Text>
+        </View>
 
 }
+
+const styles = StyleSheet.create({
+    view: {
+        flex: 1
+    },
+    emptyView: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginVertical: '50%'
+    },
+    item: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 10,
+        margin: 3,
+        padding: 8,
+        backgroundColor: '#eee',
+    },
+    text: {
+        width: '70%'
+    },
+    actionIcons: {
+        flexDirection: 'row',
+    },
+    icon: {
+        margin: 4,
+        padding: 4
+    }
+})
