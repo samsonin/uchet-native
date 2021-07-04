@@ -1,8 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Button, PushNotificationIOS, ScrollView, StyleSheet, Text, ToastAndroid, View} from 'react-native';
+import {Button, ScrollView, StyleSheet, Text, ToastAndroid, View} from 'react-native';
 
 import {Camera} from 'expo-camera';
 import { Audio } from 'expo-av';
+import { RootSiblingParent } from 'react-native-root-siblings';
+import Toast from 'react-native-root-toast';
 
 import Context from "./src/context";
 
@@ -36,7 +38,8 @@ const sounds = [
 
 const scanModes = [
     {name: 'выбрать режим...', mode: 'good'},
-    // {name: 'транзит', mode: 'transit'},
+    {name: 'из транзита', mode: 'fromTransit'},
+    {name: 'в транзит', mode: 'toTransit'},
     {name: 'инвентаризация', mode: 'inventory'},
 ]
 
@@ -65,23 +68,23 @@ export default function App() {
 
     async function playSound(soundId) {
 
-        console.log('Loading Sound');
+        // console.log('Loading Sound');
 
         const { success } = await Audio.Sound.createAsync(
             require('./assets/sounds/success.wav')
-        );
+        )
         const { warning } = await Audio.Sound.createAsync(
             require('./assets/sounds/warning.wav')
-        );
-        setSound(soundId ? warning : success);
+        )
+        setSound(soundId ? warning : success)
 
-        console.log('Playing Sound');
+        // console.log('Playing Sound')
         await sound.playAsync(); }
 
     useEffect(() => {
         return sound
             ? () => {
-                console.log('Unloading Sound');
+                // console.log('Unloading Sound');
                 sound.unloadAsync(); }
             : undefined;
     }, [sound]);
@@ -91,20 +94,6 @@ export default function App() {
         setIsLeftMenuShow(false)
 
         updApp({stock_id})
-
-    }
-
-    const notify = text => {
-
-        if (Platform.OS === 'android') {
-
-            ToastAndroid.show(text, 2)
-
-        } else {
-
-            // PushNotificationIOS.scheduleLocalNotification();
-
-        }
 
     }
 
@@ -207,15 +196,22 @@ export default function App() {
                 .then(res => {
                     console.log(res)
 
+                    let message = res.status
+
                     if (res.status === 200){
 
-                        playSound(0).then(r => notify('учтено ' + res.body.model))
+                        playSound(0).then(r => {})
+
+                        message = 'учтено: ' + res.body.model
 
                     } else if (res.status === 422) {
 
-                        playSound(2).then(r => notify('error: ' + res.body.error))
+                        playSound(2).then(r => {})
 
+                        message = res.body.error
                     }
+
+                    Toast.show(message)
 
                 })
 
@@ -259,124 +255,126 @@ export default function App() {
 
     }
 
-    return auth
-        ? < Context.Provider
-            value={{
-                setLoading,
-                app,
-                setStockId,
-                updApp,
-                auth
-            }}>
-            <View
-                style={styles.container}>
-                < Header
-                    isAuth={auth.user_id > 0}
-                    leftMenuHandler={leftMenuHandler}
-                    accountMenuHandler={accountMenuHandler}
-                />
+    return <RootSiblingParent>
+        {auth
+            ? < Context.Provider
+                value={{
+                    setLoading,
+                    app,
+                    setStockId,
+                    updApp,
+                    auth
+                }}>
+                <View
+                    style={styles.container}>
+                    < Header
+                        isAuth={auth.user_id > 0}
+                        leftMenuHandler={leftMenuHandler}
+                        accountMenuHandler={accountMenuHandler}
+                    />
 
-                {app
-                    ? <>
-                        <View style={styles.content}>
+                    {app
+                        ? <>
+                            <View style={styles.content}>
 
-                            {isLeftMenuShow && !isBarcodeOpen && <LeftMenu
-                                close={() => setIsLeftMenuShow(false)}
-                                setIsBarcodeOpen={setIsBarcodeOpen}
-                            />}
+                                {isLeftMenuShow && !isBarcodeOpen && <LeftMenu
+                                    close={() => setIsLeftMenuShow(false)}
+                                    setIsBarcodeOpen={setIsBarcodeOpen}
+                                />}
 
-                            {isAccountMenuShow && !isBarcodeOpen && <AccountMenu
-                                setInitialAuth={setInitialAuth}
-                            />}
+                                {isAccountMenuShow && !isBarcodeOpen && <AccountMenu
+                                    setInitialAuth={setInitialAuth}
+                                />}
 
-                            {isBarcodeOpen
-                                ? hasPermission === false
-                                    ? emptyView('Нет доступа к камере')
-                                    : <View style={styles.scanView}>
-                                        <BarCodeScanner
-                                            // type="front"
-                                            // onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                                            onBarCodeScanned={handleBarCodeScanned}
-                                            // style={StyleSheet.absoluteFillObject}
-                                            style={styles.scanner}
-                                        />
-                                        <Button style={styles.scannerButton}
-                                                title='отмена'
-                                                onPress={() => setIsBarcodeOpen(false)}
-                                                color="red"
-                                        />
-                                        <Button style={styles.scannerButton}
-                                                title={scanModes.find(m => m.mode === scanMode).name}
-                                                onPress={() => refRBSheet.current.open()}
-                                                color="blue"
-                                        />
-                                    </View>
-                                : contentId === 1
-                                    ? <Orders openOrder={openOrder}/>
-                                    : contentId === 2
-                                        ? app.stock_id
-                                            ? <Consignments/>
-                                            : emptyView('Выберите точку')
-                                        : contentId === 3
-                                            ? <Transit/>
-                                            : contentId === 5
-                                                ? <Customers/>
-                                                : contentId === 8
-                                                    ? <Daily/>
-                                                    : contentId === 9
-                                                        ? <Zp/>
-                                                        : contentId === 11
-                                                            ? <Order
-                                                                currentOrder={currentOrder}
-                                                                closeOrder={closeOrder}
-                                                            />
-                                                            : contentId === 99
-                                                                ? good && <Good good={good} setGood={setGood}/>
-                                                                : emptyView('Добро пожаловать!')
-                            }
+                                {isBarcodeOpen
+                                    ? hasPermission === false
+                                        ? emptyView('Нет доступа к камере')
+                                        : <View style={styles.scanView}>
+                                            <BarCodeScanner
+                                                // type="front"
+                                                // onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                                                onBarCodeScanned={handleBarCodeScanned}
+                                                // style={StyleSheet.absoluteFillObject}
+                                                style={styles.scanner}
+                                            />
+                                            <Button style={styles.scannerButton}
+                                                    title='отмена'
+                                                    onPress={() => setIsBarcodeOpen(false)}
+                                                    color="red"
+                                            />
+                                            <Button style={styles.scannerButton}
+                                                    title={scanModes.find(m => m.mode === scanMode).name}
+                                                    onPress={() => refRBSheet.current.open()}
+                                                    color="blue"
+                                            />
+                                        </View>
+                                    : contentId === 1
+                                        ? <Orders openOrder={openOrder}/>
+                                        : contentId === 2
+                                            ? app.stock_id
+                                                ? <Consignments/>
+                                                : emptyView('Выберите точку')
+                                            : contentId === 3
+                                                ? <Transit/>
+                                                : contentId === 5
+                                                    ? <Customers/>
+                                                    : contentId === 8
+                                                        ? <Daily/>
+                                                        : contentId === 9
+                                                            ? <Zp/>
+                                                            : contentId === 11
+                                                                ? <Order
+                                                                    currentOrder={currentOrder}
+                                                                    closeOrder={closeOrder}
+                                                                />
+                                                                : contentId === 99
+                                                                    ? good && <Good good={good} setGood={setGood}/>
+                                                                    : emptyView('Добро пожаловать!')
+                                }
 
-                            {isSubMenuVisible && !isBarcodeOpen && <SubMenu
-                                id={subMenuId}
+                                {isSubMenuVisible && !isBarcodeOpen && <SubMenu
+                                    id={subMenuId}
+                                    setContentId={setContentId}
+                                    setSubMenuVisible={setSubMenuVisible}
+                                />}
+
+                            </View>
+
+                            <Bottom
                                 setContentId={setContentId}
-                                setSubMenuVisible={setSubMenuVisible}
-                            />}
+                                subMenu={subMenu}
+                            />
 
-                        </View>
+                            <RBSheet
+                                ref={refRBSheet}
+                                closeOnDragDown={true}
+                                closeOnPressMask={true}
+                                height={200}
+                            >
+                                <ScrollView>
+                                    {scanModes.map(b => <Button
+                                        color="#999"
+                                        key={'customerviewreferalsbuttonsk' + b.mode}
+                                        style={styles.scrollButton}
+                                        title={b.name}
+                                        onPress={() => scanModeHandle(b.mode)}
+                                    />)}
+                                </ScrollView>
+                            </RBSheet>
 
-                        <Bottom
-                            setContentId={setContentId}
-                            subMenu={subMenu}
-                        />
+                        </>
+                        : <ActivityIndicator/>}
 
-                        <RBSheet
-                            ref={refRBSheet}
-                            closeOnDragDown={true}
-                            closeOnPressMask={true}
-                            height={200}
-                        >
-                            <ScrollView>
-                                {scanModes.map(b => <Button
-                                    color="#999"
-                                    key={'customerviewreferalsbuttonsk' + b.mode}
-                                    style={styles.scrollButton}
-                                    title={b.name}
-                                    onPress={() => scanModeHandle(b.mode)}
-                                />)}
-                            </ScrollView>
-                        </RBSheet>
-
-                    </>
-                    : <ActivityIndicator/>}
-
-            </View>
-        </Context.Provider>
-        : <Auth auth={auth}
-                setAuth={setAuth}
-                setApp={setApp}
-                updApp={updApp}
-                isLoading={isLoading}
-                setLoading={setLoading}
-        />
+                </View>
+            </Context.Provider>
+            : <Auth auth={auth}
+                    setAuth={setAuth}
+                    setApp={setApp}
+                    updApp={updApp}
+                    isLoading={isLoading}
+                    setLoading={setLoading}
+            />}
+            </RootSiblingParent>
 }
 
 const styles = StyleSheet.create({
