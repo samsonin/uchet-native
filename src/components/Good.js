@@ -67,7 +67,7 @@ export const Good = props => {
 
         setRequesting(true)
 
-        rest('transit/' + app.stock_id + '/' + props.good.barcode ,
+        rest('transit/' + app.stock_id + '/' + props.good.barcode,
             isTo ? 'POST' : 'DELETE')
             .then(res => response(res, isTo ? 'ок, в транзите' : 'ок, в магазине'))
             .then(_ => setWo(false))
@@ -133,7 +133,13 @@ export const Good = props => {
 
     let cost = (props.good.remcost || props.good.cost).toString()
 
-    let wf = app.providers.find(p => p.id === props.good.provider_id).name
+    let provider = app.providers.find(p => p.id === props.good.provider_id)
+
+    let wf = provider
+        ? provider.name
+        : typeof props.good.wf === 'string'
+            ? props.good.wf
+            : null
 
 
     return <ScrollView style={styles.view}>
@@ -191,10 +197,10 @@ export const Good = props => {
             {[
                 {label: 'категория', value: categoryName},
                 {label: 'наименование', value: props.good.model},
-                !!props.good.imei && {label: 'наименование', value: props.good.model},
+                !!props.good.imei && {label: 'imei', value: props.good.imei},
                 {label: 'себестоимость', value: cost},
                 {label: 'оприходовали', value: props.good.time},
-                {label: 'откуда', value: wf},
+                !!props.good.wf && {label: 'откуда', value: wf},
             ].map(i => i && <Input
                 key={'inputkeyimgood' + i.label}
                 label={i.label}

@@ -25,7 +25,6 @@ export const TransitItemInfo = props => {
             </TouchableOpacity>
 
             {!app.stock_id || <TouchableOpacity
-                style={styles.icon}
                 onPress={() => props.fromTransit(props.good)}
             >
                 {Platform.OS === 'ios'

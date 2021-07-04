@@ -2,7 +2,7 @@
   "expo": {
     "name": "UchetStore",
     "slug": "uchetstore-simplest-crm",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/ios_icon.png",
     "splash": {
@@ -31,7 +31,7 @@
     "description": "",
     "android": {
       "package": "com.samsonin.uchetstore",
-      "versionCode": 3
+      "versionCode": 4
     }
   }
 }

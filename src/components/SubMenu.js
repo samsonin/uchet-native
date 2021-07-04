@@ -4,7 +4,7 @@ import {Button, View, StyleSheet, TouchableOpacity} from "react-native";
 
 const items = [
     [
-        // {id: 0, title: 'Новый заказ'},
+        {id: 11, title: 'Новый заказ'},
         {id: 1, title: 'Все заказы'},
     ],
     [

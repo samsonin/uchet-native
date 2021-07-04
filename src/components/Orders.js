@@ -23,7 +23,7 @@ export const Orders = props => {
 
     }, [])
 
-    const renderOrderButton = ({order_id, stock_id}) => <Text>
+    const renderOrderText = ({order_id, stock_id}) => <Text>
         {app.stock_id === stock_id
             ? order_id
             : app && app.stocks.find(s => s.id === stock_id).name + ', ' + order_id}
@@ -36,8 +36,9 @@ export const Orders = props => {
                 {orders.map(o => <TouchableOpacity
                         style={styles.orderButton}
                         key={'orderstou' + o.order_id + o.stock_id}
+                        onPress={() => props.openOrder(o)}
                     >
-                        {renderOrderButton(o)}
+                        {renderOrderText(o)}
                     </TouchableOpacity>)}
             </ScrollView>
 

@@ -3645,6 +3645,16 @@ expo-asset@~8.3.1:
     path-browserify "^1.0.0"
     url-parse "^1.4.4"
 
+expo-av@~9.1.2:
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-9.1.2.tgz#d114feb505d59adc4bda8790d02b6a928a34889d"
+  integrity sha512-PaG7QqujOruVwtkNkuEKlqSQuBxv7Ef0QZPzfEAiASNEtlVvrsFtRsIpvJwc1Ji0f8x5iJsALeoPTiltNkDP8A==
+  dependencies:
+    "@expo/config-plugins" "^1.0.18"
+    lodash "^4.17.15"
+    nullthrows "^1.1.0"
+    unimodules-permissions-interface "~6.1.0"
+
 expo-barcode-scanner@~10.1.2:
   version "10.1.2"
   resolved "https://registry.yarnpkg.com/expo-barcode-scanner/-/expo-barcode-scanner-10.1.2.tgz#51e3d176124862273073bbf8fb542534cb2f1e27"
@@ -5282,7 +5292,7 @@ npm-run-path@^2.0.0:
   dependencies:
     path-key "^2.0.0"
 
-nullthrows@^1.1.1:
+nullthrows@^1.1.0, nullthrows@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/nullthrows/-/nullthrows-1.1.1.tgz#7818258843856ae971eae4208ad7d7eb19a431b1"
   integrity sha512-2vPPEi+Z7WqML2jZYddDIfy5Dqb0r2fze2zTxNNknZaFpVHU3mFB3R+DWeJWGVx0ecvttSGlJTI+WG+8Z4cDWw==
@@ -5783,6 +5793,11 @@ react-native-safe-area-context@3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.2.0.tgz#06113c6b208f982d68ab5c3cebd199ca93db6941"
   integrity sha512-k2Nty4PwSnrg9HwrYeeE+EYqViYJoOFwEy9LxL5RIRfoqxAq/uQXNGwpUg2/u4gnKpBbEPa9eRh15KKMe/VHkA==
+
+react-native-sound@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/react-native-sound/-/react-native-sound-0.11.0.tgz#ad60b55ba8c6dc89917f381ad3713f2738de530f"
+  integrity sha512-4bGAZfni6E2L695NQjOZwNLBQGXgBGYC4Sy+h99K5h0HqNZjCqR0+aLel+ezASxEJDpaH83gylNObXpiqJgdwg==
 
 react-native-status-bar-height@^2.5.0:
   version "2.5.0"

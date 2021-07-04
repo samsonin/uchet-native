@@ -30,9 +30,6 @@ export default function fetchPost(url, method = 'GET', data = '') {
                             status: res.status,
                             ok: res.ok
                         };
-
-                        // console.log(res)
-
                         return res;
                     })
                     .then(res => res.json())

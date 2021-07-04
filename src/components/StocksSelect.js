@@ -44,7 +44,7 @@ export const StocksSelect = props => {
             <TouchableOpacity style={{
                 margin: 8
             }}
-                              onPress={() => updApp({stock_id: null})}
+                              onPress={() => setStockId()}
             >
                 <Ionicons name="exit-outline" size={24} color="black"/>
             </TouchableOpacity>
