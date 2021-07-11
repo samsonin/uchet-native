@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View} from "react-native";
+import {Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 
 import Context from "../context";
 import RBSheet from "react-native-raw-bottom-sheet";
@@ -9,6 +9,7 @@ import ActivityIndicator from "./ActivityIndicator";
 import {FontAwesome} from '@expo/vector-icons';
 import {MaterialIcons} from '@expo/vector-icons';
 import {Input} from "react-native-elements";
+import Toast from 'react-native-root-toast';
 
 
 const fontSize = 18
@@ -33,8 +34,7 @@ export const Good = props => {
             ? okMessage
             : 'ошибка: ' + res.body.error
 
-        if (Platform.OS === 'android') ToastAndroid.show(message, 5)
-        else alert(message)
+         Toast.show(message)
 
         if (res.status === 200) props.setGood()
 

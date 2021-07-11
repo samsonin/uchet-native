@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Button, ScrollView, StyleSheet, Text, ToastAndroid, View} from 'react-native';
+import {Button, ScrollView, StyleSheet, Text, View} from 'react-native';
 
 import {Camera} from 'expo-camera';
 import { Audio } from 'expo-av';
@@ -38,8 +38,8 @@ const sounds = [
 
 const scanModes = [
     {name: 'выбрать режим...', mode: 'good'},
-    {name: 'из транзита', mode: 'fromTransit'},
-    {name: 'в транзит', mode: 'toTransit'},
+    // {name: 'из транзита', mode: 'fromTransit'},
+    // {name: 'в транзит', mode: 'toTransit'},
     {name: 'инвентаризация', mode: 'inventory'},
 ]
 
@@ -68,24 +68,19 @@ export default function App() {
 
     async function playSound(soundId) {
 
-        // console.log('Loading Sound');
-
-        const { success } = await Audio.Sound.createAsync(
-            require('./assets/sounds/success.wav')
+        const { sound } = await Audio.Sound.createAsync(
+            soundId
+                ? require('./assets/sounds/warning.wav')
+                : require('./assets/sounds/success.wav')
         )
-        const { warning } = await Audio.Sound.createAsync(
-            require('./assets/sounds/warning.wav')
-        )
-        setSound(soundId ? warning : success)
 
-        // console.log('Playing Sound')
+        setSound(sound)
+
         await sound.playAsync(); }
 
     useEffect(() => {
         return sound
-            ? () => {
-                // console.log('Unloading Sound');
-                sound.unloadAsync(); }
+            ? () => {sound.unloadAsync(); }
             : undefined;
     }, [sound]);
 
@@ -194,24 +189,18 @@ export default function App() {
 
             rest('inventory/' + app.stock_id + '/' + data, 'POST')
                 .then(res => {
-                    console.log(res)
 
-                    let message = res.status
+                    // console.log(res)
 
                     if (res.status === 200){
 
-                        playSound(0).then(r => {})
-
-                        message = 'учтено: ' + res.body.model
+                        playSound(0).then(r => Toast.show('учтено: ' + res.body.model))
 
                     } else if (res.status === 422) {
 
-                        playSound(2).then(r => {})
+                        playSound(2).then(r => Toast.show(res.body.error))
 
-                        message = res.body.error
                     }
-
-                    Toast.show(message)
 
                 })
 
@@ -250,8 +239,6 @@ export default function App() {
 
         setScanMode(mode)
         refRBSheet.current.close()
-
-        console.log(mode)
 
     }
 

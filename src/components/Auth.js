@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {View, TextInput, Button, StyleSheet, Alert, Text, Linking, Platform, ToastAndroid} from 'react-native'
+import {View, TextInput, Button, StyleSheet, Alert, Linking} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import rest from "../common/Rest";
 
@@ -158,13 +158,6 @@ export const Auth = props => {
                         // connection closed
                         // console.log('onclose')
                         // console.log(e.code, e.reason);
-
-                        // if (Platform.OS === "android") {
-                        //
-                        //     ToastAndroid.show('onclose' + e.reason, 5)
-                        //
-                        // }
-
 
                     };
 

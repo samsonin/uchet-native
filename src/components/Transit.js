@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 import Context from "../context";
 import ActivityIndicator from "./ActivityIndicator";
@@ -7,6 +7,7 @@ import {Ionicons} from "@expo/vector-icons";
 
 import rest from '../common/Rest'
 import {TransitItemInfo} from './TransitItemInfo'
+import Toast from "react-native-root-toast";
 
 export const Transit = () => {
 
@@ -26,22 +27,19 @@ export const Transit = () => {
 
                 setRequesting(false)
 
-
-
                 if (res.status === 200) {
 
                     updApp(res.body)
 
-                    const message = 'ok'
-
-                    if (Platform.OS === 'android') ToastAndroid.show(message, 5)
-                    else alert(message)
+                    Toast.show('ok')
 
                     setDetails(null)
 
                 } else {
 
-                    console.log(res)
+                    // console.log(res)
+
+                    Toast.show('error')
 
                 }
 

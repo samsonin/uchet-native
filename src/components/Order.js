@@ -19,22 +19,23 @@ export const Order = ({currentOrder, closeOrder}) => {
 
     })
 
-    useEffect(() => {
-
-        if (order) return
-
-        rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id)
-            .then(res => {
-
-                if (res.status === 200) {
-
-                    setOrder(res.body)
-
-                }
-
-            })
-
-    }, [])
+    // useEffect(() => {
+    //
+    //     if (!order) {
+    //
+    //         rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id)
+    //             .then(res => {
+    //
+    //                 if (res.status === 200) {
+    //
+    //                     setOrder(res.body)
+    //
+    //                 }
+    //
+    //             })
+    //     }
+    //
+    // }, [])
 
     const renderOrderText = ({order_id, stock_id}) => {
 
