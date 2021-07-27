@@ -2,8 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Button, ScrollView, StyleSheet, Text, View} from 'react-native';
 
 import {Camera} from 'expo-camera';
-import { Audio } from 'expo-av';
-import { RootSiblingParent } from 'react-native-root-siblings';
+import {Audio} from 'expo-av';
+import {RootSiblingParent} from 'react-native-root-siblings';
 import Toast from 'react-native-root-toast';
 
 import Context from "./src/context";
@@ -59,8 +59,6 @@ export default function App() {
     const [good, setGood] = useState()
     const [currentOrder, setCurrentOrder] = useState()
     const [sound, setSound] = useState();
-
-
     const [hasPermission, setHasPermission] = useState(null);
 
     const refRBSheet = useRef();
@@ -68,7 +66,7 @@ export default function App() {
 
     async function playSound(soundId) {
 
-        const { sound } = await Audio.Sound.createAsync(
+        const {sound} = await Audio.Sound.createAsync(
             soundId
                 ? require('./assets/sounds/warning.wav')
                 : require('./assets/sounds/success.wav')
@@ -76,13 +74,15 @@ export default function App() {
 
         setSound(sound)
 
-        await sound.playAsync(); }
+        await sound.playAsync();
+    }
 
-    useEffect(() => {
-        return sound
-            ? () => {sound.unloadAsync(); }
-            : undefined;
-    }, [sound]);
+    useEffect(() => sound
+        ? () => {
+            sound.unloadAsync();
+        }
+        : undefined
+        , [sound]);
 
     const setStockId = stock_id => {
 
@@ -96,24 +96,19 @@ export default function App() {
 
         if (Object.keys(props)[0] === 'orders') {
 
-            const next = {...prev}
+            const newOrder = props.orders[0]
 
-            next.orders.map(o => {
-
-                if (o.id === props.orders[0].id && o.stock_id === props.orders[0].stock_id) {
-
-                    return props.orders[0]
-
-                }
-
-                return o
-
-            })
+            return contentId === 11 &&
+            currentOrder.order_id === newOrder.id && currentOrder.stock_id === newOrder.stock_id
+                ? {...prev, orders: [newOrder]}
+                : {...prev}
 
         }
 
         return ({...prev, ...props})
     })
+
+    // app && console.log('app.orders', app.orders)
 
     const accountMenuHandler = () => {
         setAccountMenuShow(!isAccountMenuShow)
@@ -180,7 +175,7 @@ export default function App() {
         } else if (scanMode === 'inventory') {
 
             if (!app.stock_id) {
-                return alert('выберите точку')
+                return Toast.show('выберите точку')
             }
 
             if (inventoryBarcode.current === data) return
@@ -190,9 +185,7 @@ export default function App() {
             rest('inventory/' + app.stock_id + '/' + data, 'POST')
                 .then(res => {
 
-                    // console.log(res)
-
-                    if (res.status === 200){
+                    if (res.status === 200) {
 
                         playSound(0).then(r => Toast.show('учтено: ' + res.body.model))
 
@@ -361,7 +354,7 @@ export default function App() {
                     isLoading={isLoading}
                     setLoading={setLoading}
             />}
-            </RootSiblingParent>
+    </RootSiblingParent>
 }
 
 const styles = StyleSheet.create({
@@ -382,7 +375,6 @@ const styles = StyleSheet.create({
         height: '80%',
     },
     scannerButton: {
-        // alignSelf: 'flex-end',
         margin: 40,
         height: '10%',
 

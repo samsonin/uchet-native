@@ -1,9 +1,11 @@
 import React, {useState} from 'react'
-import {View, TextInput, Button, StyleSheet, Alert, Linking} from 'react-native'
+import {View, TextInput, Button, StyleSheet, Linking} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import rest from "../common/Rest";
 
-import {LOGIN, PASS, RUSTAM, OLYA} from "@env"
+import Toast from 'react-native-root-toast';
+
+import {LOGIN, PASS, TEST_LOGIN, TEST_PASS, RUSTAM, OLYA} from "@env"
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
@@ -38,9 +40,27 @@ const parseJwt = token => {
 
 export const Auth = props => {
 
-    const [login, setLogin] = useState(LOGIN || '');
-    const [password, setPassword] = useState(PASS || '');
+    const [login, setLogin] = useState(() => LOGIN || '');
+    const [password, setPassword] = useState(() => PASS || '');
+    const [password2, setPassword2] = useState();
     const [isLoginValid, setLoginValid] = useState(false);
+    const [isRestoreTry, setIsRestoreTry] = useState(false);
+    const [isHaveCode, setIsHaveCode] = useState(false);
+    const [code, setCode] = useState();
+
+    function regFetch(url, body) {
+
+        return fetch('https://api.uchet.store/' + url, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
+        })
+
+    }
 
     const loginValidator = login => {
 
@@ -57,24 +77,14 @@ export const Auth = props => {
         return result;
     }
 
-    const loginButtonHandler = () => {
+    const loginButtonHandler = (needValid = true) => {
 
-        if (!loginValidator(login)) return
+        if (needValid && !loginValidator(login)) return
 
-        props.setLoading(true)
-
-        fetch('https://api.uchet.store/login', {
-            method: 'POST',
-            mode: 'cors',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                phone_number: login,
-                email: login,
-                password
-            })
+        regFetch('login', {
+            phone_number: login,
+            email: needValid ? login : TEST_LOGIN,
+            password: needValid ? password : TEST_PASS
         })
             .then(res => res.text())
             .then(jwt => {
@@ -104,7 +114,7 @@ export const Auth = props => {
                     }
 
                 } catch (e) {
-                    Alert.alert('Ошибка', 'Неправильный логин или пароль')
+                    Toast.show('Неправильный логин или пароль')
                 }
 
                 try {
@@ -165,7 +175,6 @@ export const Auth = props => {
                     console.error("ws " + e)
                 }
 
-
             })
             .catch(error => {
                 console.error('Ошибка запроса: ', error)
@@ -177,27 +186,111 @@ export const Auth = props => {
 
     }
 
+    const confirmPassButtonHandler = () => {
+
+        if (isHaveCode) {
+
+            if (password !== password2) {
+                return Toast.show('passwords different')
+            }
+
+            regFetch('restore', {
+                login,
+                code,
+                password
+            })
+                .then(res => {
+
+                    if (res.status === 200) {
+
+                        Toast.show('ок, пароль изменен')
+
+                        setIsRestoreTry(false)
+                        setIsHaveCode(false)
+
+                    } else {
+
+                        Toast.show('ошибка: ' + res.body)
+
+                    }
+
+                })
+
+        } else {
+
+            regFetch('codes', {login})
+                .then(res => {
+
+                    if (res.status === 200) {
+                        setIsHaveCode(true)
+                    } else {
+                        Toast.show('неправильный логин')
+                    }
+
+                })
+
+        }
+
+
+    }
+
     return <View style={styles.auth}>
-        <TextInput style={styles.input}
-                   placeholder={'Номер телефона или email'}
-                   onChangeText={text => loginValidator(text)}
-                   value={login}
-                   disableFullscreenUI={props.isLoading}
-        />
-        <TextInput style={styles.input}
-                   placeholder={'Пароль'}
-                   secureTextEntry
-                   onChangeText={text => setPassword(text)}
-                   value={password}
-        />
+        {!isRestoreTry && <TextInput style={styles.input}
+                                     placeholder={'Номер телефона или email'}
+                                     onChangeText={text => loginValidator(text)}
+                                     value={login}
+                                     disableFullscreenUI={props.isLoading}
+        />}
+        {isRestoreTry && isHaveCode && <TextInput style={styles.input}
+                                                  placeholder={'Код из сообщения'}
+                                                  onChangeText={text => setCode(text)}
+                                                  value={code}
+        />}
+        {!isRestoreTry || (isHaveCode && isRestoreTry)
+            ? <TextInput style={styles.input}
+                         placeholder={'Пароль'}
+                         secureTextEntry
+                         onChangeText={text => setPassword(text)}
+                         value={password}
+            />
+            : null}
+        {isRestoreTry && isHaveCode && <TextInput style={styles.input}
+                                                  placeholder={'Подтвердите пароль'}
+                                                  secureTextEntry
+                                                  onChangeText={text => setPassword2(text)}
+                                                  value={password2}
+        />}
         <View style={styles.buttons}>
-            <Button title='Войти'
-                    disabled={props.isLoading || (!LOGIN && !isLoginValid)}
-                    onPress={loginButtonHandler}
-            />
-            <Button title='Зарегистрироваться'
-                    onPress={() => Linking.openURL('https://uchet.store')}
-            />
+            {isRestoreTry
+                ? <>
+                    <Button title={isHaveCode
+                        ? 'Подтвердить'
+                        : 'Запросить код'}
+                            onPress={confirmPassButtonHandler}
+                    />
+                    <Button title={isHaveCode ? 'Нет кода' : 'Есть код'}
+                            onPress={() => setIsHaveCode(!isHaveCode)}
+                    />
+                    <Button title='Назад'
+                            onPress={() => setIsRestoreTry(false)}
+                    />
+                </>
+                : <>
+                    <Button title='Войти'
+                            disabled={props.isLoading || (!LOGIN && !isLoginValid)}
+                            onPress={loginButtonHandler}
+                    />
+                    <Button title='Забыли пароль?'
+                            disabled={props.isLoading || (!LOGIN && !isLoginValid)}
+                            onPress={() => setIsRestoreTry(true)}
+                    />
+                    <Button title='Зарегистрироваться'
+                            onPress={() => Linking.openURL('https://uchet.store')}
+                    />
+                    <Button title='Тестировать'
+                            onPress={() => loginButtonHandler(false)}
+                    />
+                </>}
         </View>
     </View>
 
@@ -212,13 +305,12 @@ const styles = StyleSheet.create({
     },
     input: {
         fontSize: 20,
-        // width: '80%',
         borderBottomWidth: 1,
         borderBottomColor: 'darkslateblue',
         marginVertical: 38,
     },
     buttons: {
-        height: 120,
+        height: '30%',
         justifyContent: 'space-around',
-    }
+    },
 })

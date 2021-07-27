@@ -9,43 +9,41 @@ import {Ionicons} from "@expo/vector-icons";
 
 export const Order = ({currentOrder, closeOrder}) => {
 
-    const {app} = useContext(Context)
+    const {app, updApp} = useContext(Context)
 
-    const [order, setOrder] = useState(() => {
+    const [order, setOrder] = useState()
 
-        return app.orders
-            ? app.orders.find(or => or.order_id === currentOrder.order_id && or.stock_id === currentOrder.stock_id)
+    useEffect(() => {
+
+        rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id)
+            .then(res => {
+
+                if (res.status === 200) {
+
+                    updApp({orders: [res.body]})
+
+                }
+            })
+
+    }, [])
+
+    useEffect(() => {
+
+        const appOrder = app.orders
+            ? app.orders.find(or => or.id === currentOrder.order_id && or.stock_id === currentOrder.stock_id)
             : null
 
-    })
+        if (appOrder) setOrder(appOrder)
 
-    // useEffect(() => {
-    //
-    //     if (!order) {
-    //
-    //         rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id)
-    //             .then(res => {
-    //
-    //                 if (res.status === 200) {
-    //
-    //                     setOrder(res.body)
-    //
-    //                 }
-    //
-    //             })
-    //     }
-    //
-    // }, [])
+    }, [app.orders])
 
-    const renderOrderText = ({order_id, stock_id}) => {
+    const renderOrderText = ({order_id, stock_id}) => <Text style={styles.title}>
+        {app.stock_id === stock_id
+            ? '#' + order_id
+            : app.stocks.find(s => s.id === stock_id).name + ' #' + order_id}
+    </Text>
 
-        return <Text style={styles.title}>
-            {app.stock_id === stock_id
-                ? '#' + order_id
-                : app.stocks.find(s => s.id === stock_id).name + ' #' + order_id}
-        </Text>
-    }
-
+    order && (order.order_id = order.id)
 
     return order
         ? order.id > 0
@@ -68,7 +66,7 @@ export const Order = ({currentOrder, closeOrder}) => {
 
                 <View style={styles.header}>
 
-                    {renderOrderText(currentOrder)}
+                    {renderOrderText(order)}
 
                 </View>
 

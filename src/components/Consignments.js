@@ -1,13 +1,14 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 import rest from '../common/Rest'
 import Context from "../context";
 import ActivityIndicator from './ActivityIndicator';
 import {Ionicons, MaterialIcons} from '@expo/vector-icons';
+import Toast from "react-native-root-toast";
 
 
-export const Consignments = props => {
+export const Consignments = () => {
 
     const [data, setData] = useState()
 
@@ -32,24 +33,14 @@ export const Consignments = props => {
 
     const del = ({provider_id, consignment_number}) => {
 
-        // console.log(provider_id, consignment_number)
-
         rest('consignments/' + provider_id + '/' + consignment_number, 'DELETE')
             .then(res => {
 
-                console.log(res)
+                Toast.show(res.status === 200
+                    ? 'Ок, Удалено!'
+                    : 'Ошибка: ' + res.error[0])
 
-                if (res.status === 200) {
-
-                    Alert.alert('Ок', 'Удалено!')
-                    init()
-
-                } else {
-
-                    Alert.alert('Ошибка', res.error[0])
-                    init()
-
-                }
+                init()
 
             })
 
