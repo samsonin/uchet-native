@@ -1,15 +1,17 @@
 import {SERVER, NEW_SERVER} from '../constants';
 
-export default function doubleRequest(data = {}, url = "") {
+export default function doubleRequest(url, data = {}) {
 
-    let init = {
+    const init = {
         method: 'POST',
-        mode: 'cors', // no-cors, cors, *same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        mode: 'cors',
+        cache: 'no-cache',
         headers: {
             'Content-Type': 'application/json'
         },
     }
+
+    console.log('data', data)
 
     if (data) init.body = JSON.stringify(data);
 

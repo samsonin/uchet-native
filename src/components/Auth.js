@@ -1,11 +1,12 @@
 import React, {useState} from 'react'
-import {View, TextInput, Button, StyleSheet, Linking} from 'react-native'
+import {View, Button, StyleSheet, Text, TextInput, ScrollView} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import rest from "../common/Rest";
-
 import Toast from 'react-native-root-toast';
 
-import {LOGIN, PASS, TEST_LOGIN, TEST_PASS, RUSTAM, OLYA} from "@env"
+import {LOGIN, PASS, RUSTAM, OLYA} from "@env"
+import {TEST_LOGIN, TEST_PASS} from '../constants'
+
+import rest from "../common/Rest";
 import doubleRequest from "../common/doubleRequest";
 import License from "./License";
 import Privacy from "./Privacy";
@@ -47,8 +48,8 @@ export const Auth = props => {
     const [status, setStatus] = useState('signIn')
 
     const [name, setName] = useState('')
-    const [login, setLogin] = useState(() => LOGIN || '');
-    const [password, setPassword] = useState(() => PASS || '');
+    const [login, setLogin] = useState(LOGIN || '');
+    const [password, setPassword] = useState(PASS || '');
     const [password2, setPassword2] = useState('')
     const [code, setCode] = useState('')
 
@@ -153,10 +154,10 @@ export const Auth = props => {
 
     const signIn = (isDemo = false) => {
 
-        doubleRequest({
-            login: isDemo ? 'mail@uchet.store' : login,
-            password: isDemo ? '1' : password
-        }, 'login')
+        doubleRequest('login', {
+            login: isDemo ? TEST_LOGIN : login,
+            password: isDemo ? TEST_PASS : password
+        })
             .then(res => res.text())
             .then(res => {
                 try {
@@ -174,7 +175,7 @@ export const Auth = props => {
 
     const sendRestoreCode = () => {
 
-        doubleRequest({login}, 'codes')
+        doubleRequest('codes', {login})
             .then(res => res.status === 200
                 ? setStatus('restore')
                 : Toast.show('Неправильный номер телефона или email'))
@@ -194,12 +195,12 @@ export const Auth = props => {
 
         if (password !== password2) return Toast.show('Пароли не совпадают')
 
-        doubleRequest({
+        doubleRequest(status, {
             name,
             login,
             code,
             password
-        }, status)
+        })
             .then(res => {
 
                 if (res.status === 200) {
@@ -220,26 +221,29 @@ export const Auth = props => {
 
     const renderField = n => {
 
-        if (n === 'privacy') return <view
+        if (n === 'privacy') return <View
             style={styles.privacy}
             key={'fieldkeyinloginmodal' + n}
         >
-            <br/>
-            Нажимая "Запросить код", вы принимаете
-            <span
+            <Text>
+                Нажимая "Запросить код регистрации", вы принимаете
+            </Text>
+            <Text
                 style={styles.span}
-                onClick={() => setStatus('license')}
+                onPress={() => setStatus('license')}
             >
-            Пользовательское соглашение
-        </span>
-            и даете согласие на
-            <span
+                Пользовательское соглашение
+            </Text>
+            <Text>
+                и даете согласие на
+            </Text>
+            <Text
                 style={styles.span}
-                onClick={() => setStatus('privacy')}
+                onPress={() => setStatus('privacy')}
             >
-            обработку персональных данных
-        </span>
-        </view>
+                обработку персональных данных
+            </Text>
+        </View>
 
         const fields = {
             name: {l: 'Ваше имя', a: text => setName(text), v: name},
@@ -259,13 +263,13 @@ export const Auth = props => {
                          error={!isLoginValid(login)}
                          disabled={status !== 'signIn'}
             />
-            : <TextInput
-                key={'fieldkeyinloginmodal' + n}
-                id={n}
-                secureTextEntry={n.length > 7}
-                placeholder={fields[n].l}
-                value={fields[n].v}
-                onChange={fields[n].a}
+            : <TextInput style={styles.input}
+                         key={'fieldkeyinloginmodal' + n}
+                         id={n}
+                         secureTextEntry={n.length > 7}
+                         placeholder={fields[n].l}
+                         value={fields[n].v}
+                         onChange={fields[n].a}
             />
 
     }
@@ -288,6 +292,7 @@ export const Auth = props => {
     }
 
     const renderButton = name => <Button
+        key={'buttonskeyinauth' + name}
         title={buttons[name].text}
         onPress={buttons[name].a}
         color={colors[buttons[name].color]}
@@ -303,15 +308,15 @@ export const Auth = props => {
             buttons: ['back', 'restore']
         },
         restore: {
-            fields: ['login', 'password', 'password2', 'code'],
+            fields: ['password', 'password2', 'code'],
             buttons: ['back', 'restoreConfirm']
         },
         preRegister: {
-            fields: ['name', 'login', 'password', 'password2', 'privacy'],
+            fields: ['name', 'password', 'password2', 'privacy'],
             buttons: ['back', 'register',]
         },
         register: {
-            fields: ['name', 'login', 'code'],
+            fields: ['name', 'code'],
             buttons: ['back', 'registerConfirm']
         },
         privacy: {
@@ -358,6 +363,6 @@ const styles = StyleSheet.create({
         margin: 1
     },
     span: {
-        // textDecoration: 'underline'
+        color: 'blue'
     }
 })
