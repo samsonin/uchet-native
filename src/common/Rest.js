@@ -1,8 +1,7 @@
 import React from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const SERVER = 'https://api.uchet.store';
-// const SERVER = 'http://127.0.0.1:8000';
+import {SERVER, NEW_SERVER} from '../constants'
+import {parseJwt} from '../components/Auth'
 
 let response = {};
 
@@ -11,8 +10,10 @@ export default function fetchPost(url, method = 'GET', data = '') {
     return AsyncStorage.getItem('jwt')
         .then(jwt => {
 
-            return typeof jwt === "string"
-                ? fetch(SERVER + '/' + url, {
+            const payload = parseJwt(jwt)
+
+            return payload && payload.organization_id
+                ? fetch((payload.organization_id < 1001 ? SERVER : NEW_SERVER) + '/' + url, {
                         method,
                         mode: 'cors',
                         cache: 'no-cache',
