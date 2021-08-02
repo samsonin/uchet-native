@@ -5,13 +5,16 @@ import rest from '../common/Rest'
 import Context from "../context";
 import ActivityIndicator from './ActivityIndicator';
 import {Ionicons} from "@expo/vector-icons";
+import {Input} from "react-native-elements";
 
 
 export const Order = ({currentOrder, closeOrder}) => {
 
-    const {app, updApp} = useContext(Context)
+    const {app, updApp, auth} = useContext(Context)
 
     const [order, setOrder] = useState()
+
+    const position = app.positions.find(p => p.id === auth.position_id)
 
     useEffect(() => {
 
@@ -45,6 +48,16 @@ export const Order = ({currentOrder, closeOrder}) => {
 
     order && (order.order_id = order.id)
 
+    const category = order && order.category_id
+        ? app.categories.find(c => c.id === order.category_id)
+        : 'Наименование'
+
+    const customer = {
+        fio: order.customer_fio ?? order.client ?? '',
+        phone_number: order.customer_phone_number ?? order.phone_number ?? ''
+    }
+
+
     return order
         ? order.id > 0
             ? <ScrollView style={styles.view}>
@@ -70,6 +83,34 @@ export const Order = ({currentOrder, closeOrder}) => {
 
                 </View>
 
+                <View style={styles.body}>
+
+                    {[
+                        {label: category, value: order.model, disabled: true},
+                        {label: 'Неисправность', value: order.defect, disabled: true},
+                        {label: 'Сумма к оплате', value: order.sum2.toString(), disabled: false},
+                        {
+                            label: 'Мастер',
+                            value: app.users.find(u => u.id === order.master_id).name,
+                            disabled: false
+                        },
+                        {
+                            label: customer.fio,
+                            value: customer.phone_number,
+                            disabled: true
+                        },
+                    ].map(f => auth.user_id === order.master_id && f.label === 'Мастер'
+                        ? null
+                        : <Input
+                            key={'inputkeyinorder' + f.label + f.value}
+                            label={f.label}
+                            value={f.value}
+                            disabled={f.disabled}
+
+                        />)}
+
+                </View>
+
                 <Text>
                     {JSON.stringify(order)}
                 </Text>
@@ -78,6 +119,7 @@ export const Order = ({currentOrder, closeOrder}) => {
             : <View style={styles.emptyView}>
                 <Text>Заказ не найден</Text>
             </View>
+
         : <ActivityIndicator/>
 
 }
@@ -110,4 +152,10 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 30,
     },
+    body: {
+        backgroundColor: 'white',
+        marginTop: 10,
+        borderWidth: 1,
+        borderRadius: 10,
+    }
 })

@@ -269,7 +269,7 @@ export const Auth = props => {
                          secureTextEntry={n.length > 7}
                          placeholder={fields[n].l}
                          value={fields[n].v}
-                         onChange={fields[n].a}
+                         onChangeText={fields[n].a}
             />
 
     }
