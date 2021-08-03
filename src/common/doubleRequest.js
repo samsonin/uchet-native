@@ -11,16 +11,14 @@ export default function doubleRequest(url, data = {}) {
         },
     }
 
-    console.log('data', data)
-
     if (data) init.body = JSON.stringify(data);
 
     function fetchReg(server) {
 
         return fetch(server + '/' + url, init)
             .catch(error => {
-                // console.error('Ошибка запроса: ', error)
-                // return {result: false}
+                console.error('Ошибка запроса: ', error)
+                return error
             })
 
     }

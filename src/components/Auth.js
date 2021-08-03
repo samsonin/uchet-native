@@ -201,19 +201,20 @@ export const Auth = props => {
             code,
             password
         })
+            .then(res => res.text())
             .then(res => {
 
                 if (res.status === 200) {
 
                     Toast.show(successText)
 
-                    init(res.text())
+                    init(res)
 
                     return setStatus('signIn')
 
                 }
 
-                Toast.show('ошибка: ' + res)
+                Toast.show('ошибка: ' + JSON.parse(res).error)
 
             })
 
