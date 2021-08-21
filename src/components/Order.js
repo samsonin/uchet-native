@@ -156,7 +156,7 @@ export const Order = ({currentOrder, closeOrder}) => {
                 >
                     <ScrollView>
                         {app.statuses.map(s => <Button
-                            color={s.color}
+                            color={'#' + s.color}
                             key={'statusesinOrders' + s.id}
                             title={s.name}
                             onPress={() => {
