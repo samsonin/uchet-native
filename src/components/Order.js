@@ -128,6 +128,7 @@ export const Order = ({currentOrder, closeOrder}) => {
                         ? null
                         : f.label === 'Статус'
                             ? <Pressable style={styles.status}
+                                         key={'inputkeyinorder' + f.label + f.value}
                                          onPress={() => refRBSheet.current.open()}
                                          color={status.color}
                             >
