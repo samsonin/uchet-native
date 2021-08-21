@@ -30,11 +30,9 @@ export const Good = props => {
 
         setRequesting(false)
 
-        const message = res.status === 200
+        Toast.show(res.status === 200
             ? okMessage
-            : 'ошибка: ' + res.body.error
-
-         Toast.show(message)
+            : 'ошибка: ' + res.body.error)
 
         if (res.status === 200) props.setGood()
 
@@ -227,11 +225,11 @@ export const Good = props => {
                     </View>
                     : null}
 
-                {currentOrder && <View style={styles.rowView}
-                ><Button
-                    title={makeTitle(currentOrder)}
-                    onPress={() => refRBSheet.current.open()}
-                />
+                {currentOrder && <View style={styles.rowView}>
+                    <Button
+                        title={makeTitle(currentOrder)}
+                        onPress={() => refRBSheet.current.open()}
+                    />
                     <Button
                         title="в заказ..."
                         onPress={() => toOrder()}

@@ -33,13 +33,22 @@ export const Orders = props => {
     return orders
         ? orders.length > 0
             ? <ScrollView style={styles.view}>
-                {orders.map(o => <TouchableOpacity
-                        style={styles.orderButton}
+                {orders.map(o => {
+
+                    const status = app.statuses.find(s => s.id === o.status_id)
+
+                    const color = status
+                        ? status.color || 'eee'
+                        : 'eee'
+
+                    return <TouchableOpacity
+                        style={styles(color).orderButton}
                         key={'orderstou' + o.order_id + o.stock_id}
                         onPress={() => props.openOrder(o)}
                     >
                         {renderOrderText(o)}
-                    </TouchableOpacity>)}
+                    </TouchableOpacity>
+                })}
             </ScrollView>
 
             : <View style={styles.emptyView}>
@@ -51,7 +60,7 @@ export const Orders = props => {
 
 }
 
-const styles = StyleSheet.create({
+const styles = (color = 'eee') => StyleSheet.create({
     view: {
         flex: 1
     },
@@ -67,6 +76,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         margin: 3,
         padding: 8,
-        backgroundColor: '#eee',
+        backgroundColor: '#' + color,
     }
 })
