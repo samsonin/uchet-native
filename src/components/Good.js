@@ -56,7 +56,7 @@ export const Good = props => {
 
         setRequesting(true)
 
-        rest('sales/' + props.good.barcode + '/' + sum, 'POST')
+        rest('sales/' + app.stock_id + '/' + props.good.barcode + '/' + sum, 'POST')
             .then(res => response(res, 'ок, продано!'))
 
     }
