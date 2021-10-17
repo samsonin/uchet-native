@@ -114,7 +114,7 @@ export const Good = props => {
                 if (res.status === 200) {
 
                     setAllowedOrders(res.body)
-                    setCurrentOrder(res.body[0])
+                    setCurrentOrder()
 
                 }
 
@@ -225,15 +225,17 @@ export const Good = props => {
                     </View>
                     : null}
 
-                {currentOrder && <View style={styles.rowView}>
+                {<View style={styles.rowView}>
                     <Button
-                        title={makeTitle(currentOrder)}
+                        title={currentOrder
+                            ? makeTitle(currentOrder)
+                            : 'в заказ...'}
                         onPress={() => refRBSheet.current.open()}
                     />
-                    <Button
-                        title="в заказ..."
+                    {currentOrder && <Button
+                        title="внести"
                         onPress={() => toOrder()}
-                    />
+                    />}
                 </View>}
 
             </>}
