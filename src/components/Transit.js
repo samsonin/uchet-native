@@ -46,9 +46,10 @@ export const Transit = () => {
             })
     }
 
-    const renderTransitItem = good => <View
+    const renderTransitItem = good => <TouchableOpacity
         key={'gooditemintransitviekey' + good.barcode}
         style={styles.item}
+        onPress={() => setDetails(good.barcode)}
     >
 
         <Text style={styles.text}>
@@ -56,15 +57,6 @@ export const Transit = () => {
         </Text>
 
         <View style={styles.actionIcons}>
-            <TouchableOpacity
-                disabled={requesting}
-                onPress={() => setDetails(good.barcode)}
-                style={styles.icon}
-            >
-                {Platform.OS === 'ios'
-                    ? <Ionicons name="ios-information-circle-outline" size={24} color="blue"/>
-                    : <Ionicons name="md-information-circle-outline" size={24} color="black"/>}
-            </TouchableOpacity>
 
             {!app.stock_id || <TouchableOpacity
                 disabled={requesting}
@@ -77,7 +69,7 @@ export const Transit = () => {
             </TouchableOpacity>}
         </View>
 
-    </View>
+    </TouchableOpacity>
 
     const goodDetails = app.transit.find(t => t.barcode === details)
 
