@@ -80,6 +80,11 @@ export const Auth = props => {
 
                                 if (res.status === 200) {
                                     props.setApp(res.body)
+
+                                    console.log(res.body)
+
+                                    if (res.body.stock_id) props.updApp({stock_id: res.body.stock_id})
+
                                 }
 
                             })
@@ -346,7 +351,7 @@ export const Auth = props => {
 const styles = StyleSheet.create({
     auth: {
         flex: 1,
-        paddingTop: 150,
+        paddingTop: 70,
         paddingHorizontal: '14%',
         flexDirection: 'column',
     },

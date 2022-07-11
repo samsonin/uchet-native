@@ -34,7 +34,7 @@ export const AccountMenu = props => {
             backgroundColor={"#0c8098"}
             onPress={() => props.setInitialAuth()}
         >
-            Exit
+            Выйти
         </FontAwesome.Button>
     </View>
 }

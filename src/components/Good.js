@@ -124,6 +124,8 @@ export const Good = props => {
 
     const position = app.positions.find(p => p.id === auth.position_id)
 
+    const editable = !requesting && !props.good.wo && props.good.stock_id === app.stock_id
+
     let category = app.categories.find(c => c.id === props.good.category_id)
     let categoryName = category
         ? category.name
@@ -157,7 +159,7 @@ export const Good = props => {
                 <FontAwesome name="truck" size={30} color="blue"/>
             </TouchableOpacity>}
 
-            {!props.good.wo && !requesting && !wo && !!position.is_sale && <View
+            {editable && <View
                 style={styles.actionIcons}
             >
                 <TouchableOpacity
@@ -206,7 +208,7 @@ export const Good = props => {
                 disabled={requesting}
             />)}
 
-            {!props.good.wo && !requesting && !wo && <>
+            {editable && <>
 
                 {position.is_sale
                     ? <View style={styles.rowView}
