@@ -76,18 +76,6 @@ export const Auth = props => {
                 AsyncStorage.setItem('jwt', jwt)
                     .then(() => {
                         rest('initial', 'GET')
-                            .then(res => {
-
-                                if (res.status === 200) {
-                                    props.setApp(res.body)
-
-                                    console.log(res.body)
-
-                                    if (res.body.stock_id) props.updApp({stock_id: res.body.stock_id})
-
-                                }
-
-                            })
                     })
             } catch (e) {
                 console.log('AsyncStorage error ' + e)

@@ -14,7 +14,7 @@ export const Transit = () => {
     const [requesting, setRequesting] = useState(false)
     const [details, setDetails] = useState()
 
-    const {app, updApp} = useContext(Context)
+    const {app} = useContext(Context)
 
     const fromTransit = good => {
 
@@ -28,8 +28,6 @@ export const Transit = () => {
                 setRequesting(false)
 
                 if (res.status === 200) {
-
-                    updApp(res.body)
 
                     Toast.show('ok')
 

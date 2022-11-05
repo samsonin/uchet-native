@@ -22,14 +22,6 @@ export const Order = ({currentOrder, closeOrder}) => {
     useEffect(() => {
 
         rest('orders/' + currentOrder.stock_id + '/' + currentOrder.order_id)
-            .then(res => {
-
-                if (res.status === 200) {
-
-                    updApp({orders: [res.body]})
-
-                }
-            })
 
     }, [])
 

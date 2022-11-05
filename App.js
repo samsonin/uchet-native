@@ -94,16 +94,23 @@ export default function App() {
 
     const updApp = props => setApp(prev => {
 
-        if (Object.keys(props)[0] === 'orders') {
+        // Object.keys(props).map(k => {
+        //     console.log('App 98', k)
+        // })
 
-            const newOrder = props.orders[0]
+        console.log('props', props)
+        console.log('prev', prev)
 
-            return contentId === 11 &&
-            currentOrder.order_id === newOrder.id && currentOrder.stock_id === newOrder.stock_id
-                ? {...prev, orders: [newOrder]}
-                : {...prev}
-
-        }
+        // if (Object.keys(props)[0] === 'orders') {
+        //
+        //     const newOrder = props.orders[0]
+        //
+        //     return contentId === 11 &&
+        //     currentOrder.order_id === newOrder.id && currentOrder.stock_id === newOrder.stock_id
+        //         ? {...prev, orders: [newOrder]}
+        //         : {...prev}
+        //
+        // }
 
         return ({...prev, ...props})
     })
@@ -203,7 +210,7 @@ export default function App() {
 
     useEffect(() => {
         (async () => {
-            const {status} = await Camera.requestPermissionsAsync()
+            const {status} = await Camera.requestCameraPermissionsAsync()
             setHasPermission(status === 'granted')
         })();
     }, []);
@@ -349,7 +356,6 @@ export default function App() {
             </Context.Provider>
             : <Auth auth={auth}
                     setAuth={setAuth}
-                    setApp={setApp}
                     updApp={updApp}
                     isLoading={isLoading}
                     setLoading={setLoading}
