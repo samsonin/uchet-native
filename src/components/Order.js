@@ -17,7 +17,6 @@ export const Order = ({currentOrder, closeOrder}) => {
 
     const refRBSheet = useRef()
 
-
     const position = app.positions.find(p => p.id === auth.position_id)
 
     useEffect(() => {

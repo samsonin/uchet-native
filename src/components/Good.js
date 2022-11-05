@@ -38,6 +38,42 @@ export const Good = props => {
 
     }
 
+    const goodRest = (url, method, success) => {
+
+        const barcode = props.good.barcode || props.good.imei
+        if (!barcode) Toast.show('Ошибка: нет кода или S/N')
+
+        rest (url + barcode, method)
+            .then(res => {
+
+                if (res.status === 200) {
+
+                    props.upd_app(res.body)
+
+                    if (props.close) props.close()
+
+                    Toast.show(success)
+
+                    if (res.body.goods) props.setGood(res.body.goods)
+
+                } else {
+
+                    Toast.show('ошибка ' + res.status)
+
+                }
+            })
+    }
+
+    const transit = isTo => goodRest('transit/' + props.app.stock_id + '/',
+        isTo ? 'POST' : 'DELETE',
+        isTo ? 'Передано в транзит' : 'Принято из транзита')
+
+    const use = () => goodRest('goods/', 'DELETE', 'Списано в пользование')
+
+    const restore = () => goodRest('goods/restore/', 'POST', 'Восстановлено')
+
+    const reject = () => goodRest('goods/reject/', 'DELETE', 'Списано в брак')
+
     const toOrder = () => {
 
         if (requesting) return
@@ -58,45 +94,6 @@ export const Good = props => {
 
         rest('sales/' + app.stock_id + '/' + props.good.barcode + '/' + sum, 'POST')
             .then(res => response(res, 'ок, продано!'))
-
-    }
-
-    const transit = isTo => {
-
-        setRequesting(true)
-
-        rest('transit/' + app.stock_id + '/' + props.good.barcode,
-            isTo ? 'POST' : 'DELETE')
-            .then(res => response(res, isTo ? 'ок, в транзите' : 'ок, в магазине'))
-            .then(_ => setWo(false))
-
-    }
-
-    const toReject = () => {
-
-        console.log('toReject')
-
-        setRequesting(true)
-
-        setTimeout(() => {
-
-            setRequesting(false)
-
-        }, 3000)
-
-    }
-
-    const toDeduct = () => {
-
-        console.log('toDeduct')
-
-        setRequesting(true)
-
-        setTimeout(() => {
-
-            setRequesting(false)
-
-        }, 3000)
 
     }
 
@@ -141,7 +138,6 @@ export const Good = props => {
             ? props.good.wf
             : null
 
-
     return <ScrollView style={styles.view}>
 
         {requesting && <ActivityIndicator/>}
@@ -171,14 +167,14 @@ export const Good = props => {
 
                 <TouchableOpacity
                     style={styles.actionIcon}
-                    onPress={() => toReject()}
+                    onPress={() => reject()}
                 >
                     <MaterialIcons name="assignment-return" size={30} color="orange"/>
                 </TouchableOpacity>
 
                 {auth.admin && <TouchableOpacity
                     style={styles.actionIcon}
-                    onPress={() => toDeduct()}
+                    onPress={() => use()}
                 >
                     <MaterialIcons name="delete" size={30} color="red"/>
                 </TouchableOpacity>}
