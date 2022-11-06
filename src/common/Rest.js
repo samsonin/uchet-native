@@ -53,6 +53,12 @@ export default function fetchPost(url, method = 'GET', data = '') {
                         }
                         return res
                     })
+                    .then(res => {
+                        if (res.status === 200) {
+                            updApp(res.body)
+                        }
+                        return res
+                    })
                     .catch(error => {
                         if (!response.ok) response.error = error;
                         return response;

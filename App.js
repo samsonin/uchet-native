@@ -43,6 +43,29 @@ const scanModes = [
     {name: 'инвентаризация', mode: 'inventory'},
 ]
 
+const probableKeys = [
+    'balance',
+    'stock_id',
+    'positions',
+    'stocks',
+    'users',
+    'stockusers',
+    'organization',
+    'config',
+    'fields',
+    'docs',
+    'entities',
+    'providers',
+    'categories',
+    'order',
+    'orders',
+    'referals',
+    'statuses',
+    'queue',
+    'daily',
+    'transit',
+]
+
 export default function App() {
 
     const [auth, setAuth] = useState();
@@ -94,28 +117,21 @@ export default function App() {
 
     const updApp = props => setApp(prev => {
 
-        // Object.keys(props).map(k => {
-        //     console.log('App 98', k)
-        // })
+            // console.log(props)
 
-        console.log('props', props)
-        console.log('prev', prev)
+        if (Object.keys(props)[0] === 'orders') {
 
-        // if (Object.keys(props)[0] === 'orders') {
-        //
-        //     const newOrder = props.orders[0]
-        //
-        //     return contentId === 11 &&
-        //     currentOrder.order_id === newOrder.id && currentOrder.stock_id === newOrder.stock_id
-        //         ? {...prev, orders: [newOrder]}
-        //         : {...prev}
-        //
-        // }
+            const newOrder = props.orders[0]
+
+            return contentId === 11 &&
+            currentOrder.order_id === newOrder.id && currentOrder.stock_id === newOrder.stock_id
+                ? {...prev, orders: [newOrder]}
+                : {...prev}
+
+        }
 
         return ({...prev, ...props})
     })
-
-    // app && console.log('app.orders', app.orders)
 
     const accountMenuHandler = () => {
         setAccountMenuShow(!isAccountMenuShow)
