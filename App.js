@@ -1,12 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {Provider} from 'react-redux'
+import store from "./src/store";
 import {Button, ScrollView, StyleSheet, Text, View} from 'react-native';
 
 import {Camera} from 'expo-camera';
 import {Audio} from 'expo-av';
 import {RootSiblingParent} from 'react-native-root-siblings';
 import Toast from 'react-native-root-toast';
-
-import Context from "./src/context";
 
 import rest from "./src/common/Rest"
 
@@ -43,28 +43,6 @@ const scanModes = [
     {name: 'инвентаризация', mode: 'inventory'},
 ]
 
-const probableKeys = [
-    'balance',
-    'stock_id',
-    'positions',
-    'stocks',
-    'users',
-    'stockusers',
-    'organization',
-    'config',
-    'fields',
-    'docs',
-    'entities',
-    'providers',
-    'categories',
-    'order',
-    'orders',
-    'referals',
-    'statuses',
-    'queue',
-    'daily',
-    'transit',
-]
 
 export default function App() {
 
@@ -101,10 +79,10 @@ export default function App() {
     }
 
     useEffect(() => sound
-        ? () => {
-            sound.unloadAsync();
-        }
-        : undefined
+            ? () => {
+                sound.unloadAsync();
+            }
+            : undefined
         , [sound]);
 
     const setStockId = stock_id => {
@@ -117,7 +95,7 @@ export default function App() {
 
     const updApp = props => setApp(prev => {
 
-            // console.log(props)
+        // console.log(props)
 
         if (Object.keys(props)[0] === 'orders') {
 
@@ -259,16 +237,9 @@ export default function App() {
     }
 
     return <RootSiblingParent>
-        {auth
-            ? < Context.Provider
-                value={{
-                    setLoading,
-                    app,
-                    setStockId,
-                    updApp,
-                    auth
-                }}>
-                <View
+        <Provider store={store}>
+            {auth
+                ? <View
                     style={styles.container}>
                     < Header
                         isAuth={auth.user_id > 0}
@@ -369,13 +340,12 @@ export default function App() {
                         : <ActivityIndicator/>}
 
                 </View>
-            </Context.Provider>
-            : <Auth auth={auth}
-                    setAuth={setAuth}
-                    updApp={updApp}
-                    isLoading={isLoading}
-                    setLoading={setLoading}
-            />}
+                : <Auth auth={auth}
+                        setAuth={setAuth}
+                        isLoading={isLoading}
+                        setLoading={setLoading}
+                />}
+        </Provider>
     </RootSiblingParent>
 }
 

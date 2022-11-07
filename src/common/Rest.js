@@ -1,14 +1,13 @@
-import React, {useContext} from "react";
+// import React from "react";
+import {updApp} from "../store/appSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SERVER, NEW_SERVER} from '../constants'
 import {parseJwt} from '../components/Auth'
-import Context from "../context";
+
 
 let response = {};
 
 export default function fetchPost(url, method = 'GET', data = '') {
-
-    const {updApp} = useContext(Context)
 
     return AsyncStorage.getItem('jwt')
         .then(jwt => {
@@ -30,9 +29,6 @@ export default function fetchPost(url, method = 'GET', data = '') {
                     }
                 )
                     .then(res => {
-
-                        console.log(res.status)
-
                         response = {
                             status: res.status,
                             ok: res.ok
@@ -45,17 +41,12 @@ export default function fetchPost(url, method = 'GET', data = '') {
                         return response;
                     })
                     .then(res => {
-
-                        console.log(res)
-
                         if (res.status === 200) {
-                            updApp(res.body)
-                        }
-                        return res
-                    })
-                    .then(res => {
-                        if (res.status === 200) {
-                            updApp(res.body)
+
+                            console.log('Rest', res.body)
+
+                            dispatch(updApp(res.body))
+
                         }
                         return res
                     })

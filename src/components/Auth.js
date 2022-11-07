@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import {updApp} from "../store/appSlice";
 import {View, Button, StyleSheet, Text, TextInput, ScrollView} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-root-toast';
@@ -10,6 +11,7 @@ import rest from "../common/Rest";
 import doubleRequest from "../common/doubleRequest";
 import License from "./License";
 import Privacy from "./Privacy";
+import {useDispatch} from "react-redux";
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
@@ -52,6 +54,8 @@ export const Auth = props => {
     const [password, setPassword] = useState(PASS || '');
     const [password2, setPassword2] = useState('')
     const [code, setCode] = useState('')
+
+    const dispatch = useDispatch()
 
     const isLoginValid = login => {
 
@@ -106,7 +110,7 @@ export const Auth = props => {
 
                     if (data.type === undefined) {
 
-                        props.updApp(data);
+                        dispatch(updApp(data))
 
                     } else if (data.type === "notification") {
 
